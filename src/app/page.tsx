@@ -53,12 +53,32 @@ function PlaceholderImage({
 }
 
 export default function Home() {
-    // ✅ RELEASES DATA
+    // RELEASES DATA
     const releases = [
-        { image: "/img/album-cover.jpg", title: "Concrete Jungle", year: "2026" },
-        { image: "/img/02.jpg", title: "Jah Army", year: "2025" },
-        { image: "/img/03.jpg", title: "Check Clean", year: "2025" },
-        { image: "/img/04.jpg", title: "Buss A Blank", year: "2023" },
+        {
+            image: "/img/album-cover.jpg",
+            title: "Concrete Jungle",
+            year: "2026",
+            link: "https://open.spotify.com/album/6U3V60m3Bs7bo2vHsHQWjB",
+        },
+        {
+            image: "/img/02.jpg",
+            title: "Jah Army",
+            year: "2025",
+            link: "https://open.spotify.com/album/21u5DdOGTJSP5l9wsS0AZN",
+        },
+        {
+            image: "/img/03.jpg",
+            title: "Check Clean",
+            year: "2025",
+            link: "https://open.spotify.com/album/4ZCNBWFJeXvwHnB5RFEBZh",
+        },
+        {
+            image: "/img/04.jpg",
+            title: "Buss A Blank",
+            year: "2023",
+            link: "https://open.spotify.com/album/1Q4GHMpVDctmsYlDgHdua0",
+        },
     ];
 
     return (
@@ -108,7 +128,6 @@ export default function Home() {
             {/* Hero Section */}
             <section className="relative h-screen flex items-center justify-center grain-overlay">
                 <div className="absolute inset-0 z-0">
-                    {/* Hero achtergrond afbeelding */}
                     <Image
                         src="/img/hero.jpg"
                         alt="Hero Background"
@@ -117,7 +136,6 @@ export default function Home() {
                         priority
                     />
 
-                    {/* Gradient overlay */}
                     <div className="absolute inset-0 bg-gradient-to-b from-red-900/30 via-black/40 to-black" />
                 </div>
 
@@ -177,26 +195,31 @@ export default function Home() {
                     </div>
 
                     <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12">
-                        <div className="w-64 md:w-80 flex-shrink-0">
+                        <a
+                            href="https://open.spotify.com/album/6U3V60m3Bs7bo2vHsHQWjB"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-64 md:w-80 flex-shrink-0 block group"
+                        >
                             <div className="relative aspect-square">
                                 <img
                                     src="/img/album-cover.jpg"
-                                    alt="Album Cover"
-                                    className="w-full h-full object-cover rounded-sm shadow-2xl shadow-red-500/20"
+                                    alt="Concrete Jungle"
+                                    className="w-full h-full object-cover rounded-sm shadow-2xl shadow-red-500/20 transition-transform duration-300 group-hover:scale-105"
                                 />
-                                <div className="absolute inset-0 border border-white/10 rounded-sm" />
+                                <div className="absolute inset-0 border border-white/10 rounded-sm group-hover:border-red-500/50 transition-all" />
                             </div>
-                        </div>
+                        </a>
 
                         <div className="flex flex-col gap-4 w-full max-w-xs">
                             <a
-                                href={socialLinks.spotify}
+                                href="https://open.spotify.com/album/6U3V60m3Bs7bo2vHsHQWjB"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="flex items-center gap-4 bg-white/5 hover:bg-red-600/20 border border-white/10 hover:border-red-500/50 px-6 py-4 transition-all group"
                             >
                                 <SpotifyIcon className="w-8 h-8 text-green-500 group-hover:text-green-400" />
-                                <span className="text-sm tracking-wider uppercase">Listen on Spotify</span>
+                                <span className="text-sm tracking-wider uppercase">Listen to Concrete Jungle</span>
                             </a>
 
                             <a
@@ -223,7 +246,13 @@ export default function Home() {
 
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 max-w-6xl mx-auto">
                         {releases.map((release, index) => (
-                            <div key={index} className="group cursor-pointer">
+                            <a
+                                key={index}
+                                href={release.link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="group block cursor-pointer"
+                            >
                                 <div className="relative aspect-square mb-3 overflow-hidden">
                                     <img
                                         src={release.image}
@@ -238,7 +267,7 @@ export default function Home() {
                                     {release.title}
                                 </h3>
                                 <p className="text-xs text-white/50 mt-1">{release.year}</p>
-                            </div>
+                            </a>
                         ))}
                     </div>
 
@@ -301,6 +330,4 @@ export default function Home() {
             </footer>
         </main>
     );
-
 }
-
