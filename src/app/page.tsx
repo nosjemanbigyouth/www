@@ -294,7 +294,7 @@ export default function Home() {
                         </div>
 
                         <p className="text-xs text-white/50 tracking-wider">
-                            &copy; {new Date().getFullYear()} Nosjeman Bigyouth. JUICED UNICORN. All rights reserved.
+                            &copy; {new Date().getFullYear()}. NOSJEMAN BIGYOUTH. IZHIA ARTS. JUICED UNICORN. All rights reserved.
                         </p>
                     </div>
                 </div>
@@ -303,3 +303,4 @@ export default function Home() {
     );
 
 }
+
