@@ -98,9 +98,6 @@ export default function Home() {
                         <a href={socialLinks.tiktok} target="_blank" rel="noopener noreferrer" className="hover:text-red-500 transition-colors">
                             <TikTokIcon className="w-5 h-5" />
                         </a>
-                        <a href={socialLinks.youtube} target="_blank" rel="noopener noreferrer" className="hover:text-red-500 transition-colors">
-                            <Youtube className="w-5 h-5" />
-                        </a>
                         <a href={socialLinks.spotify} target="_blank" rel="noopener noreferrer" className="hover:text-red-500 transition-colors">
                             <SpotifyIcon className="w-5 h-5" />
                         </a>
@@ -304,4 +301,5 @@ export default function Home() {
             </footer>
         </main>
     );
+
 }
