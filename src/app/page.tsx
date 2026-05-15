@@ -168,8 +168,8 @@ export default function Home() {
                         <div className="relative aspect-video bg-black rounded-sm overflow-hidden border border-white/10">
                             <iframe
                                 className="absolute inset-0 w-full h-full"
-                                src="https://www.youtube.com/embed/KC2D-BHPYnU"
-                                title="YouTube video player"
+                                src="https://www.youtube.com/embed/ehE8FoAYVnE"
+                                title="Nosjeman Bigyouth video player"
                                 frameBorder="0"
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                                 allowFullScreen
