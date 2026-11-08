@@ -1408,7 +1408,52 @@
       return { videoId: '', embedUrl: trimmed };
     }
 
-    // IMAGE UPLOAD FUNCTIONALITY WITH INSTANT IN-MEMORY PREVIEW
+    // IMAGE UPLOAD FUNCTIONALITY WITH INSTANT IN-MEMORY PREVIEW & GITHUB RAW FALLBACK
+    window._uploadedPreviewBlobs = window._uploadedPreviewBlobs || {};
+
+    function resolveImageSrc(path) {
+      if (!path) return '';
+      if (window._uploadedPreviewBlobs && window._uploadedPreviewBlobs[path]) {
+        return window._uploadedPreviewBlobs[path];
+      }
+      return path;
+    }
+
+    function setupImageWithFallback(imgEl, fallbackDefault) {
+      if (!imgEl) return;
+      imgEl.onerror = function() {
+        const rawSrc = this.getAttribute('data-raw-src') || this.getAttribute('src') || '';
+        // 1. Check in-memory blob
+        if (window._uploadedPreviewBlobs && window._uploadedPreviewBlobs[rawSrc]) {
+          this.src = window._uploadedPreviewBlobs[rawSrc];
+          return;
+        }
+        for (const [k, v] of Object.entries(window._uploadedPreviewBlobs || {})) {
+          if (rawSrc && rawSrc.endsWith(k)) {
+            this.src = v;
+            return;
+          }
+        }
+        // 2. Check GitHub raw URL if it's an /img/ path
+        const cfg = getStoredConfig();
+        const repo = cfg.repo || 'nosjemanbigyouth/www';
+        const branch = cfg.branch || 'main';
+        if (rawSrc.includes('/img/')) {
+          const parts = rawSrc.split('/img/');
+          const fileName = parts[parts.length - 1].split('?')[0];
+          const rawGh = `https://raw.githubusercontent.com/${repo}/${branch}/public/img/${fileName}`;
+          if (this.src !== rawGh) {
+            this.src = rawGh;
+            return;
+          }
+        }
+        // 3. Fallback to default placeholder image
+        if (fallbackDefault && this.src !== fallbackDefault) {
+          this.src = fallbackDefault;
+        }
+      };
+    }
+
     async function uploadImageFile(file, statusEl, onUploaded) {
       if (!file) return;
       if (!file.type.startsWith('image/')) {
@@ -1425,6 +1470,11 @@
       const ext = cleanName.includes('.') ? cleanName.substring(cleanName.lastIndexOf('.')) : '.jpg';
       const base = cleanName.includes('.') ? cleanName.substring(0, cleanName.lastIndexOf('.')) : cleanName;
       const targetFileName = `${base}-${timestamp}${ext}`;
+      const targetPath = `/img/${targetFileName}`;
+
+      // Instant blob URL registered in memory for seamless preview
+      const localBlob = URL.createObjectURL(file);
+      window._uploadedPreviewBlobs[targetPath] = localBlob;
 
       let localSuccess = false;
 
@@ -1432,6 +1482,7 @@
       try {
         const formData = new FormData();
         formData.append('file', file);
+        formData.append('filename', targetFileName);
         const res = await fetch('/api/upload', {
           method: 'POST',
           body: formData
@@ -1447,7 +1498,7 @@
       const reader = new FileReader();
       reader.onload = async (e) => {
         const base64Data = e.target.result.split(',')[1];
-        const targetPath = `/img/${targetFileName}`;
+        window._uploadedPreviewBlobs[targetPath] = e.target.result;
 
         // If GitHub is connected, commit image directly to repo
         if (cfg.token && cfg.repo) {
@@ -1518,7 +1569,7 @@
           <div class="release-content-grid">
             <div>
               <div class="release-thumb">
-                <img src="${rel.image || '/img/album-cover.jpg'}" alt="Cover">
+                <img src="${resolveImageSrc(rel.image || '/img/album-cover.jpg')}" data-raw-src="${rel.image || '/img/album-cover.jpg'}" alt="Cover">
               </div>
               <input type="file" class="release-file-input" accept="image/*" style="display:none;">
               <button type="button" class="upload-btn btn-upload-release-cover" style="width:100%; margin-top:0.4rem; justify-content:center;">
@@ -1571,12 +1622,16 @@
         const uploadBtn = item.querySelector('.btn-upload-release-cover');
         const uploadStatus = item.querySelector('.release-upload-status');
 
+        setupImageWithFallback(thumbImg, '/img/album-cover.jpg');
+
         titleInput.addEventListener('input', () => { currentData.releases[index].title = titleInput.value; });
         typeInput.addEventListener('change', () => { currentData.releases[index].type = typeInput.value; });
         yearInput.addEventListener('input', () => { currentData.releases[index].year = yearInput.value; });
         imageInput.addEventListener('input', () => {
-          currentData.releases[index].image = imageInput.value;
-          thumbImg.src = imageInput.value;
+          const val = imageInput.value.trim();
+          currentData.releases[index].image = val;
+          thumbImg.setAttribute('data-raw-src', val);
+          thumbImg.src = resolveImageSrc(val) || '/img/album-cover.jpg';
         });
         linkInput.addEventListener('input', () => { currentData.releases[index].link = linkInput.value; });
 
@@ -1586,12 +1641,14 @@
           if (fileInput.files && fileInput.files[0]) {
             const file = fileInput.files[0];
             // 1. Instant preview from browser memory
-            thumbImg.src = URL.createObjectURL(file);
+            const localBlob = URL.createObjectURL(file);
+            thumbImg.src = localBlob;
 
             // 2. Upload file
             uploadImageFile(file, uploadStatus, (uploadedUrl) => {
               imageInput.value = uploadedUrl;
               currentData.releases[index].image = uploadedUrl;
+              thumbImg.setAttribute('data-raw-src', uploadedUrl);
             });
           }
         });
@@ -1735,7 +1792,9 @@
       const hero = currentData.hero || {};
       document.getElementById('heroImage').value = hero.image || '';
       document.getElementById('heroSubtitle').value = hero.subtitle || '';
-      document.getElementById('heroPreviewImg').src = hero.image || '/img/hero.jpg';
+      const heroPreview = document.getElementById('heroPreviewImg');
+      heroPreview.setAttribute('data-raw-src', hero.image || '/img/hero.jpg');
+      heroPreview.src = resolveImageSrc(hero.image || '/img/hero.jpg');
       document.getElementById('heroPreviewSubtitle').innerText = (hero.subtitle || 'REGGAE ARTIST').toUpperCase();
       applyHeroPosition(hero.position || 'center 50%');
 
@@ -1762,7 +1821,9 @@
       document.getElementById('previewLatestBadge').innerText = latest.badge || 'LATEST RELEASE';
       document.getElementById('previewLatestHeading').innerText = latest.heading || 'NEW MUSIC';
       document.getElementById('previewLatestTitle').innerText = latest.title || 'Titel';
-      document.getElementById('previewLatestImg').src = latest.artwork || '/img/album-cover.jpg';
+      const previewLatestImg = document.getElementById('previewLatestImg');
+      previewLatestImg.setAttribute('data-raw-src', latest.artwork || '/img/album-cover.jpg');
+      previewLatestImg.src = resolveImageSrc(latest.artwork || '/img/album-cover.jpg');
       document.getElementById('previewLatestListenBtn').innerText = latest.listenButtonText || `Listen to ${latest.title || 'Track'}`;
       document.getElementById('previewLatestWatchBtn').innerText = latest.watchButtonText || 'Watch on YouTube';
 
@@ -2146,8 +2207,14 @@
       });
 
       // Hero inputs & live preview
+      setupImageWithFallback(document.getElementById('heroPreviewImg'), '/img/hero.jpg');
+      setupImageWithFallback(document.getElementById('previewLatestImg'), '/img/album-cover.jpg');
+
       document.getElementById('heroImage').addEventListener('input', (e) => {
-        document.getElementById('heroPreviewImg').src = e.target.value;
+        const val = e.target.value.trim();
+        const heroImg = document.getElementById('heroPreviewImg');
+        heroImg.setAttribute('data-raw-src', val);
+        heroImg.src = resolveImageSrc(val) || '/img/hero.jpg';
       });
       document.getElementById('heroSubtitle').addEventListener('input', (e) => {
         document.getElementById('heroPreviewSubtitle').innerText = (e.target.value || 'REGGAE ARTIST').toUpperCase();
@@ -2159,22 +2226,17 @@
           const file = e.target.files[0];
           // 1. Direct in-memory blob URL (never broken, 100% instant)
           const localBlob = URL.createObjectURL(file);
-          document.getElementById('heroPreviewImg').src = localBlob;
+          const heroImg = document.getElementById('heroPreviewImg');
+          heroImg.setAttribute('data-raw-src', localBlob);
+          heroImg.src = localBlob;
 
           // 2. Upload and save path
           uploadImageFile(file, document.getElementById('heroUploadStatus'), (url) => {
             document.getElementById('heroImage').value = url;
+            heroImg.setAttribute('data-raw-src', url);
           });
         }
       });
-
-      // Hero image error fallback to ensure preview never breaks
-      const heroPreviewImgEl = document.getElementById('heroPreviewImg');
-      if (heroPreviewImgEl) {
-        heroPreviewImgEl.addEventListener('error', () => {
-          heroPreviewImgEl.src = '/img/hero.jpg';
-        });
-      }
 
       // Hero alignment buttons (Vertical)
       document.querySelectorAll('.btn-hero-v').forEach(btn => {
@@ -2285,7 +2347,10 @@
         document.getElementById('previewLatestTitle').innerText = e.target.value || 'Titel';
       });
       document.getElementById('latestArtwork').addEventListener('input', (e) => {
-        document.getElementById('previewLatestImg').src = e.target.value;
+        const val = e.target.value.trim();
+        const latestImg = document.getElementById('previewLatestImg');
+        latestImg.setAttribute('data-raw-src', val);
+        latestImg.src = resolveImageSrc(val) || '/img/album-cover.jpg';
       });
       document.getElementById('latestListenBtn').addEventListener('input', (e) => {
         document.getElementById('previewLatestListenBtn').innerText = e.target.value || 'Listen';
@@ -2299,10 +2364,13 @@
         if (e.target.files && e.target.files[0]) {
           const file = e.target.files[0];
           const localBlob = URL.createObjectURL(file);
-          document.getElementById('previewLatestImg').src = localBlob;
+          const latestImg = document.getElementById('previewLatestImg');
+          latestImg.setAttribute('data-raw-src', localBlob);
+          latestImg.src = localBlob;
 
           uploadImageFile(file, document.getElementById('latestArtworkUploadStatus'), (url) => {
             document.getElementById('latestArtwork').value = url;
+            latestImg.setAttribute('data-raw-src', url);
           });
         }
       });
