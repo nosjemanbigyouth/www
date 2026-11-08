@@ -6,6 +6,7 @@ export async function POST(request: NextRequest) {
     try {
         const formData = await request.formData();
         const file = formData.get("file") as File | null;
+        const requestedFileName = formData.get("filename") as string | null;
 
         if (!file) {
             return NextResponse.json(
@@ -14,17 +15,25 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Sanitize filename: remove spaces and special characters
-        const originalName = file.name || "upload.jpg";
-        const ext = path.extname(originalName).toLowerCase() || ".jpg";
-        const baseName = path
-            .basename(originalName, ext)
-            .toLowerCase()
-            .replace(/[^a-z0-9_-]/g, "-")
-            .replace(/-+/g, "-");
-        
-        const timestamp = Date.now().toString().slice(-6);
-        const fileName = `${baseName}-${timestamp}${ext}`;
+        let fileName = "";
+        if (requestedFileName && typeof requestedFileName === "string") {
+            // Keep clean exact filename sent by admin client
+            fileName = path.basename(requestedFileName).toLowerCase().replace(/[^a-z0-9._-]/g, "-");
+        }
+
+        if (!fileName) {
+            // Sanitize filename: remove spaces and special characters
+            const originalName = file.name || "upload.jpg";
+            const ext = path.extname(originalName).toLowerCase() || ".jpg";
+            const baseName = path
+                .basename(originalName, ext)
+                .toLowerCase()
+                .replace(/[^a-z0-9_-]/g, "-")
+                .replace(/-+/g, "-");
+            
+            const timestamp = Date.now().toString().slice(-6);
+            fileName = `${baseName}-${timestamp}${ext}`;
+        }
 
         const bytes = await file.arrayBuffer();
         const buffer = Buffer.from(bytes);
