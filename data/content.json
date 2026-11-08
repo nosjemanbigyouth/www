@@ -1,0 +1,66 @@
+{
+  "hero": {
+    "image": "/img/hero.jpg",
+    "subtitle": "Reggae Artist",
+    "position": "center"
+  },
+  "featuredVideo": {
+    "youtubeUrl": "https://www.youtube.com/watch?v=2rV53wNfkOg",
+    "embedUrl": "https://www.youtube.com/embed/2rV53wNfkOg",
+    "title": "Nosjeman Bigyouth video player"
+  },
+  "latestRelease": {
+    "badge": "LATEST RELEASE",
+    "heading": "NEW MUSIC",
+    "title": "Concrete Jungle",
+    "releaseDate": "2026",
+    "description": "Concrete Jungle",
+    "artwork": "/img/album-cover.jpg",
+    "spotifyUrl": "https://open.spotify.com/album/6U3V60m3Bs7bo2vHsHQWjB",
+    "youtubeUrl": "https://www.youtube.com/@nosjemanbigyouth",
+    "listenButtonText": "Listen to Concrete Jungle",
+    "watchButtonText": "Watch on YouTube"
+  },
+  "releases": [
+    {
+      "id": "rel-1",
+      "title": "Concrete Jungle",
+      "type": "Album",
+      "year": "2026",
+      "image": "/img/album-cover.jpg",
+      "link": "https://open.spotify.com/album/6U3V60m3Bs7bo2vHsHQWjB"
+    },
+    {
+      "id": "rel-2",
+      "title": "Jah Army",
+      "type": "Single",
+      "year": "2025",
+      "image": "/img/02.jpg",
+      "link": "https://open.spotify.com/album/21u5DdOGTJSP5l9wsS0AZN"
+    },
+    {
+      "id": "rel-3",
+      "title": "Check Clean",
+      "type": "Single",
+      "year": "2025",
+      "image": "/img/03.jpg",
+      "link": "https://open.spotify.com/album/4ZCNBWFJeXvwHnB5RFEBZh"
+    },
+    {
+      "id": "rel-4",
+      "title": "Buss A Blank",
+      "type": "Single",
+      "year": "2023",
+      "image": "/img/04.jpg",
+      "link": "https://open.spotify.com/album/1Q4GHMpVDctmsYlDgHdua0"
+    }
+  ],
+  "socialLinks": {
+    "spotify": "https://open.spotify.com/artist/5pWOl8Mk1utpqJJ3ZL5O9H",
+    "instagram": "https://instagram.com/nosjemanbigyouth",
+    "tiktok": "https://tiktok.com/@nosjemanbigyouth",
+    "facebook": "https://facebook.com/nosjeman.bigyouth",
+    "youtube": "https://www.youtube.com/@nosjemanbigyouth"
+  },
+  "footerCopyright": "NOSJEMAN BIGYOUTH. IZHIA ARTS. JUICED UNICORN. All rights reserved."
+}
