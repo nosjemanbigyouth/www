@@ -1,14 +1,79 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Instagram, Facebook, Youtube } from "lucide-react";
 
-// Social media links
-const socialLinks = {
-    instagram: "https://instagram.com/nosjemanbigyouth",
-    tiktok: "https://tiktok.com/@nosjemanbigyouth",
-    facebook: "https://facebook.com/nosjeman.bigyouth",
-    spotify: "https://open.spotify.com/artist/5pWOl8Mk1utpqJJ3ZL5O9H",
-    youtube: "https://www.youtube.com/@nosjemanbigyouth",
+// Fallback initial data matching the exact hardcoded site values
+const fallbackContent = {
+    hero: {
+        image: "/img/hero.jpg",
+        alt: "Hero Background",
+        subtitle: "Reggae Artist",
+        position: "center",
+    },
+    featuredVideo: {
+        youtubeUrl: "https://www.youtube.com/watch?v=2rV53wNfkOg",
+        embedUrl: "https://www.youtube.com/embed/2rV53wNfkOg",
+        title: "Nosjeman Bigyouth video player",
+    },
+    latestRelease: {
+        badge: "LATEST RELEASE",
+        heading: "NEW MUSIC",
+        title: "Concrete Jungle",
+        releaseDate: "2026",
+        description: "Concrete Jungle",
+        artwork: "/img/album-cover.jpg",
+        spotifyUrl: "https://open.spotify.com/album/6U3V60m3Bs7bo2vHsHQWjB",
+        youtubeUrl: "https://www.youtube.com/@nosjemanbigyouth",
+        listenButtonText: "Listen to Concrete Jungle",
+        watchButtonText: "Watch on YouTube",
+    },
+    releases: [
+        {
+            id: "rel-1",
+            image: "/img/album-cover.jpg",
+            title: "Concrete Jungle",
+            type: "Album",
+            year: "2026",
+            link: "https://open.spotify.com/album/6U3V60m3Bs7bo2vHsHQWjB",
+        },
+        {
+            id: "rel-2",
+            image: "/img/02.jpg",
+            title: "Jah Army",
+            type: "Single",
+            year: "2025",
+            link: "https://open.spotify.com/album/21u5DdOGTJSP5l9wsS0AZN",
+        },
+        {
+            id: "rel-3",
+            image: "/img/03.jpg",
+            title: "Check Clean",
+            type: "Single",
+            year: "2025",
+            link: "https://open.spotify.com/album/4ZCNBWFJeXvwHnB5RFEBZh",
+        },
+        {
+            id: "rel-4",
+            image: "/img/04.jpg",
+            title: "Buss A Blank",
+            type: "Single",
+            year: "2023",
+            link: "https://open.spotify.com/album/1Q4GHMpVDctmsYlDgHdua0",
+        },
+    ],
+    socialLinks: {
+        instagram: "https://instagram.com/nosjemanbigyouth",
+        tiktok: "https://tiktok.com/@nosjemanbigyouth",
+        facebook: "https://facebook.com/nosjeman.bigyouth",
+        spotify: "https://open.spotify.com/artist/5pWOl8Mk1utpqJJ3ZL5O9H",
+        youtube: "https://www.youtube.com/@nosjemanbigyouth",
+    },
+    footerCopyright: "NOSJEMAN BIGYOUTH. IZHIA ARTS. JUICED UNICORN. All rights reserved.",
 };
+
+type ContentState = typeof fallbackContent;
 
 function TikTokIcon({ className }: { className?: string }) {
     return (
@@ -53,33 +118,34 @@ function PlaceholderImage({
 }
 
 export default function Home() {
-    // RELEASES DATA
-    const releases = [
-        {
-            image: "/img/album-cover.jpg",
-            title: "Concrete Jungle",
-            year: "2026",
-            link: "https://open.spotify.com/album/6U3V60m3Bs7bo2vHsHQWjB",
-        },
-        {
-            image: "/img/02.jpg",
-            title: "Jah Army",
-            year: "2025",
-            link: "https://open.spotify.com/album/21u5DdOGTJSP5l9wsS0AZN",
-        },
-        {
-            image: "/img/03.jpg",
-            title: "Check Clean",
-            year: "2025",
-            link: "https://open.spotify.com/album/4ZCNBWFJeXvwHnB5RFEBZh",
-        },
-        {
-            image: "/img/04.jpg",
-            title: "Buss A Blank",
-            year: "2023",
-            link: "https://open.spotify.com/album/1Q4GHMpVDctmsYlDgHdua0",
-        },
-    ];
+    const [content, setContent] = useState<ContentState>(fallbackContent);
+
+    // Dynamic data injection on mount / DOM load
+    useEffect(() => {
+        fetch(`/data/content.json?t=${Date.now()}`)
+            .then((res) => {
+                if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+                return res.json();
+            })
+            .then((data) => {
+                if (data) {
+                    setContent((prev: ContentState) => ({
+                        ...prev,
+                        ...data,
+                        hero: { ...prev.hero, ...(data.hero || {}) },
+                        featuredVideo: { ...prev.featuredVideo, ...(data.featuredVideo || {}) },
+                        latestRelease: { ...prev.latestRelease, ...(data.latestRelease || {}) },
+                        releases: Array.isArray(data.releases) ? data.releases : prev.releases,
+                        socialLinks: { ...prev.socialLinks, ...(data.socialLinks || {}) },
+                    }));
+                }
+            })
+            .catch((err) => {
+                console.info("Using fallback content for website:", err.message);
+            });
+    }, []);
+
+    const { hero, featuredVideo, latestRelease, releases, socialLinks } = content;
 
     return (
         <main className="min-h-screen bg-[#0d0d0d] text-white overflow-x-hidden">
@@ -129,10 +195,11 @@ export default function Home() {
             <section className="relative h-screen flex items-center justify-center grain-overlay">
                 <div className="absolute inset-0 z-0">
                     <Image
-                        src="/img/hero.jpg"
-                        alt="Hero Background"
+                        src={hero.image}
+                        alt={hero.alt}
                         fill
                         className="object-cover"
+                        style={{ objectPosition: (hero as any).position || "center" }}
                         priority
                     />
 
@@ -149,7 +216,7 @@ export default function Home() {
                         priority
                     />
                     <p className="text-sm md:text-base tracking-[0.3em] uppercase text-white/80 mb-8">
-                        Reggae Artist
+                        {hero.subtitle}
                     </p>
                 </div>
 
@@ -168,8 +235,8 @@ export default function Home() {
                         <div className="relative aspect-video bg-black rounded-sm overflow-hidden border border-white/10">
                             <iframe
                                 className="absolute inset-0 w-full h-full"
-                                src="https://www.youtube.com/embed/2rV53wNfkOg"
-                                title="Nosjeman Bigyouth video player"
+                                src={featuredVideo.embedUrl}
+                                title={featuredVideo.title}
                                 frameBorder="0"
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                                 allowFullScreen
@@ -183,29 +250,29 @@ export default function Home() {
             <section className="relative py-16 md:py-24 grain-overlay overflow-hidden">
                 <div className="absolute inset-0">
                     <div className="w-full h-full placeholder-image opacity-30">
-                        <span className="text-sm">Concrete Jungle</span>
+                        <span className="text-sm">{latestRelease.title}</span>
                     </div>
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0d0d0d] via-[#0d0d0d]/80 to-[#0d0d0d]" />
                 </div>
 
                 <div className="container mx-auto px-4 relative z-10">
                     <div className="text-center mb-12">
-                        <p className="text-red-500 tracking-[0.4em] text-xs md:text-sm mb-2">LATEST RELEASE</p>
-                        <h2 className="text-4xl md:text-6xl font-bold tracking-wider">NEW MUSIC</h2>
+                        <p className="text-red-500 tracking-[0.4em] text-xs md:text-sm mb-2">{latestRelease.badge}</p>
+                        <h2 className="text-4xl md:text-6xl font-bold tracking-wider">{latestRelease.heading}</h2>
                     </div>
 
                     <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12">
                         <a
-                            href="https://open.spotify.com/album/6U3V60m3Bs7bo2vHsHQWjB"
+                            href={latestRelease.spotifyUrl}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="w-64 md:w-80 flex-shrink-0 block group"
                         >
-                            <div className="relative aspect-square">
+                            <div className="relative aspect-square overflow-hidden rounded-sm">
                                 <img
-                                    src="/img/album-cover.jpg"
-                                    alt="Concrete Jungle"
-                                    className="w-full h-full object-cover rounded-sm shadow-2xl shadow-red-500/20 transition-transform duration-300 group-hover:scale-105"
+                                    src={latestRelease.artwork}
+                                    alt={latestRelease.title}
+                                    className="w-full h-full object-cover object-center rounded-sm shadow-2xl shadow-red-500/20 transition-transform duration-300 group-hover:scale-105"
                                 />
                                 <div className="absolute inset-0 border border-white/10 rounded-sm group-hover:border-red-500/50 transition-all" />
                             </div>
@@ -213,23 +280,27 @@ export default function Home() {
 
                         <div className="flex flex-col gap-4 w-full max-w-xs">
                             <a
-                                href="https://open.spotify.com/album/6U3V60m3Bs7bo2vHsHQWjB"
+                                href={latestRelease.spotifyUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="flex items-center gap-4 bg-white/5 hover:bg-red-600/20 border border-white/10 hover:border-red-500/50 px-6 py-4 transition-all group"
                             >
                                 <SpotifyIcon className="w-8 h-8 text-green-500 group-hover:text-green-400" />
-                                <span className="text-sm tracking-wider uppercase">Listen to Concrete Jungle</span>
+                                <span className="text-sm tracking-wider uppercase">
+                                    {latestRelease.listenButtonText || `Listen to ${latestRelease.title}`}
+                                </span>
                             </a>
 
                             <a
-                                href={socialLinks.youtube}
+                                href={latestRelease.youtubeUrl || socialLinks.youtube}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="flex items-center gap-4 bg-white/5 hover:bg-red-600/20 border border-white/10 hover:border-red-500/50 px-6 py-4 transition-all group"
                             >
                                 <Youtube className="w-8 h-8 text-red-500 group-hover:text-red-400" />
-                                <span className="text-sm tracking-wider uppercase">Watch on YouTube</span>
+                                <span className="text-sm tracking-wider uppercase">
+                                    {latestRelease.watchButtonText || "Watch on YouTube"}
+                                </span>
                             </a>
                         </div>
                     </div>
@@ -247,17 +318,17 @@ export default function Home() {
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 max-w-6xl mx-auto">
                         {releases.map((release, index) => (
                             <a
-                                key={index}
+                                key={release.id || index}
                                 href={release.link}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="group block cursor-pointer"
                             >
-                                <div className="relative aspect-square mb-3 overflow-hidden">
+                                <div className="relative aspect-square mb-3 overflow-hidden rounded-sm">
                                     <img
                                         src={release.image}
                                         alt={release.title}
-                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                        className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
                                     />
                                     <div className="absolute inset-0 bg-red-600/0 group-hover:bg-red-600/20 transition-colors" />
                                     <div className="absolute inset-0 border border-white/10 group-hover:border-red-500/50 transition-colors" />
@@ -323,7 +394,7 @@ export default function Home() {
                         </div>
 
                         <p className="text-xs text-white/50 tracking-wider">
-                            &copy; {new Date().getFullYear()}. NOSJEMAN BIGYOUTH. IZHIA ARTS. JUICED UNICORN. All rights reserved.
+                            &copy; {new Date().getFullYear()}. {content.footerCopyright || "NOSJEMAN BIGYOUTH. IZHIA ARTS. JUICED UNICORN. All rights reserved."}
                         </p>
                     </div>
                 </div>
