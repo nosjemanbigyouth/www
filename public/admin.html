@@ -1,0 +1,2348 @@
+<!DOCTYPE html>
+<html lang="nl" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nosjeman CMS Admin Panel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-body: #090a0f;
+      --bg-card: #12141c;
+      --bg-card-subtle: #181b26;
+      --bg-input: #1a1e2b;
+      --border-color: #272c3d;
+      --border-focus: #ef4444;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --text-dim: #6b7280;
+      --accent: #ef4444;
+      --accent-hover: #dc2626;
+      --accent-glow: rgba(239, 68, 68, 0.25);
+      --success: #10b981;
+      --success-glow: rgba(16, 185, 129, 0.2);
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --radius-full: 9999px;
+      --shadow-card: 0 10px 30px -10px rgba(0,0,0,0.5);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-body);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Navbar */
+    .navbar {
+      background-color: rgba(18, 20, 28, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0.85rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: var(--text-main);
+    }
+
+    .brand-badge {
+      background: linear-gradient(135deg, #ef4444, #991b1b);
+      color: white;
+      font-weight: 800;
+      font-size: 0.75rem;
+      padding: 0.25rem 0.55rem;
+      border-radius: var(--radius-sm);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .brand-title {
+      font-weight: 700;
+      font-size: 1.1rem;
+      letter-spacing: -0.01em;
+    }
+
+    .brand-subtitle {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-left: 0.25rem;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      font-family: inherit;
+      font-size: 0.875rem;
+      font-weight: 600;
+      padding: 0.55rem 1rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+      box-shadow: 0 4px 14px var(--accent-glow);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: var(--accent-hover);
+      box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: var(--bg-card-subtle);
+      color: var(--text-main);
+      border-color: var(--border-color);
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: var(--bg-input);
+      border-color: #3b4259;
+    }
+
+    .btn-outline-danger {
+      background: transparent;
+      color: #f87171;
+      border-color: rgba(239, 68, 68, 0.3);
+    }
+
+    .btn-outline-danger:hover:not(:disabled) {
+      background: rgba(239, 68, 68, 0.1);
+      border-color: var(--accent);
+    }
+
+    .btn-sm {
+      padding: 0.35rem 0.65rem;
+      font-size: 0.75rem;
+    }
+
+    .btn-hero-v.active,
+    .btn-hero-h.active {
+      background: var(--accent) !important;
+      color: white !important;
+      border-color: var(--accent) !important;
+      box-shadow: 0 2px 8px var(--accent-glow);
+    }
+
+    /* Layout */
+    .main-layout {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1.5rem 1.25rem 3rem;
+      width: 100%;
+      flex: 1;
+    }
+
+    /* Login Screen Gate */
+    .login-container {
+      max-width: 520px;
+      margin: 3rem auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 2.25rem;
+      box-shadow: var(--shadow-card);
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 1.75rem;
+    }
+
+    .login-header h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-top: 0.5rem;
+    }
+
+    .login-header p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 0.4rem;
+    }
+
+    /* Alert / Notice */
+    .alert {
+      padding: 1rem 1.25rem;
+      border-radius: var(--radius-md);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      font-size: 0.875rem;
+      border: 1px solid;
+    }
+
+    .alert-info {
+      background: rgba(59, 130, 246, 0.08);
+      border-color: rgba(59, 130, 246, 0.25);
+      color: #93c5fd;
+    }
+
+    .alert-success {
+      background: rgba(16, 185, 129, 0.08);
+      border-color: rgba(16, 185, 129, 0.25);
+      color: #6ee7b7;
+    }
+
+    .alert-warning {
+      background: rgba(245, 158, 11, 0.08);
+      border-color: rgba(245, 158, 11, 0.25);
+      color: #fcd34d;
+    }
+
+    .alert-danger {
+      background: rgba(239, 68, 68, 0.08);
+      border-color: rgba(239, 68, 68, 0.25);
+      color: #fca5a5;
+    }
+
+    /* Tab navigation - Neutral circles */
+    .nav-tabs {
+      display: flex;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 1.75rem;
+      overflow-x: auto;
+      padding-bottom: 0.25rem;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 0.875rem;
+      font-weight: 600;
+      padding: 0.65rem 1rem;
+      border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      position: relative;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-main);
+      background: var(--bg-card-subtle);
+    }
+
+    .tab-btn.active {
+      color: #ffffff;
+      background: var(--bg-card);
+    }
+
+    .tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--accent);
+    }
+
+    /* Neutral indicator dot instead of emojis */
+    .nav-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--border-color);
+      border: 1px solid var(--text-dim);
+      display: inline-block;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .tab-btn:hover .nav-dot {
+      border-color: var(--text-muted);
+      background: var(--text-dim);
+    }
+
+    .tab-btn.active .nav-dot {
+      background: var(--accent);
+      border-color: var(--accent);
+      box-shadow: 0 0 8px var(--accent-glow);
+    }
+
+    .tab-badge {
+      background: rgba(255, 255, 255, 0.1);
+      font-size: 0.7rem;
+      padding: 0.1rem 0.4rem;
+      border-radius: var(--radius-full);
+    }
+
+    /* Panels */
+    .tab-panel {
+      display: none;
+    }
+
+    .tab-panel.active {
+      display: block;
+      animation: fadeIn 0.2s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Cards */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow-card);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .card-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .card-description {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    /* Grid Form */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+
+    @media (max-width: 860px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.825rem;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+      color: var(--text-main);
+    }
+
+    .form-hint {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      margin-top: 0.35rem;
+    }
+
+    .required {
+      color: var(--accent);
+    }
+
+    .form-control {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 0.65rem 0.85rem;
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.875rem;
+      transition: all 0.2s ease;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    /* Greyed out / readonly inputs */
+    .form-control-disabled,
+    .form-control:disabled,
+    .form-control[readonly].greyed-out {
+      background: rgba(255, 255, 255, 0.03) !important;
+      border-color: rgba(255, 255, 255, 0.08) !important;
+      color: var(--text-dim) !important;
+      cursor: not-allowed !important;
+      opacity: 0.65;
+    }
+
+    .input-with-button {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .input-with-button .form-control {
+      flex: 1;
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .checkbox-label input[type="checkbox"] {
+      accent-color: var(--accent);
+      width: 1rem;
+      height: 1rem;
+    }
+
+    /* Upload Controls */
+    .upload-row {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .upload-btn {
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      color: #fca5a5;
+      font-size: 0.775rem;
+      padding: 0.45rem 0.85rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .upload-btn:hover {
+      background: rgba(239, 68, 68, 0.25);
+      color: #ffffff;
+      border-color: var(--accent);
+    }
+
+    .upload-status {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+
+    /* Live Previews */
+    .preview-box {
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .hero-preview-canvas {
+      position: relative;
+      width: 100%;
+      height: 220px;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      background: #000;
+    }
+
+    .hero-preview-canvas img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .hero-preview-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(127, 29, 29, 0.3), rgba(0,0,0,0.4), #000);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 1rem;
+    }
+
+    .hero-preview-tag {
+      font-size: 0.75rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.8);
+      margin-top: 0.5rem;
+    }
+
+    .video-preview-wrapper {
+      position: relative;
+      width: 100%;
+      padding-top: 56.25%; /* 16:9 Aspect Ratio */
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      background: #000;
+    }
+
+    .video-preview-wrapper iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* Release item card in Discography */
+    .release-item {
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+      position: relative;
+      transition: all 0.2s ease;
+    }
+
+    .release-item:hover {
+      border-color: #3f4761;
+    }
+
+    .release-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .release-number-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--accent);
+      background: rgba(239, 68, 68, 0.1);
+      padding: 0.2rem 0.5rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    .release-actions {
+      display: flex;
+      gap: 0.4rem;
+    }
+
+    .release-content-grid {
+      display: grid;
+      grid-template-columns: 110px 1fr;
+      gap: 1.25rem;
+      align-items: start;
+    }
+
+    @media (max-width: 640px) {
+      .release-content-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .release-thumb {
+      width: 110px;
+      height: 110px;
+      aspect-ratio: 1 / 1;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .release-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+    }
+
+    /* Code & JSON editor */
+    .code-editor {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      background: #0d1117;
+      color: #e6edf3;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 1rem;
+      width: 100%;
+      min-height: 380px;
+      resize: vertical;
+      line-height: 1.45;
+    }
+
+    /* Toast Notification */
+    .toast-container {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      max-width: 420px;
+    }
+
+    .toast {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1rem 1.25rem;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    .toast-body {
+      flex: 1;
+      font-size: 0.85rem;
+    }
+
+    .toast-title {
+      font-weight: 700;
+      margin-bottom: 0.2rem;
+    }
+
+    .toast-desc {
+      color: var(--text-muted);
+    }
+
+    .toast-close {
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    /* Status Bar */
+    .status-bar {
+      margin-top: 2rem;
+      padding: 0.85rem 1.25rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.825rem;
+      color: var(--text-muted);
+    }
+
+    .status-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #9ca3af;
+    }
+
+    .status-dot.online {
+      background: var(--success);
+      box-shadow: 0 0 8px var(--success-glow);
+    }
+
+    .status-dot.syncing {
+      background: var(--warning);
+      animation: pulse 1s infinite alternate;
+    }
+
+    .status-dot.offline {
+      background: var(--danger);
+    }
+
+    @keyframes pulse {
+      from { opacity: 0.4; }
+      to { opacity: 1; }
+    }
+
+    /* Admin Footer - Copyright Text */
+    .admin-page-footer {
+      margin-top: 2rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      letter-spacing: 0.05em;
+    }
+
+    /* Utility */
+    .text-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.15rem 0.45rem;
+      border-radius: var(--radius-sm);
+    }
+
+    .badge-gray {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <header class="navbar">
+    <div class="nav-container">
+      <div class="brand">
+        <span class="brand-badge">Admin</span>
+        <div>
+          <span class="brand-title">NOSJEMAN BIGYOUTH</span>
+          <span class="brand-subtitle">Serverless CMS</span>
+        </div>
+      </div>
+
+      <div class="nav-actions">
+        <a href="/" target="_blank" class="btn btn-secondary btn-sm" title="Bekijk de live website">
+          Live Site
+        </a>
+        <button id="btnReload" class="btn btn-secondary btn-sm" title="Actuele data opnieuw ophalen van GitHub" style="display:none;">
+          Herladen
+        </button>
+        <button id="btnPublish" class="btn btn-primary" title="Commit en publiceer direct naar GitHub" style="display:none;">
+          <span>Publiceren naar Website</span>
+        </button>
+        <button id="btnTopLogout" class="btn btn-outline-danger btn-sm" title="Uitloggen uit CMS" style="display:none;">
+          Uitloggen
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-layout">
+
+    <!-- LOGIN SCREEN / AUTHENTICATION GATE -->
+    <div id="loginGate" class="login-container">
+      <div class="login-header">
+        <span class="brand-badge" style="font-size: 0.85rem; padding: 0.35rem 0.75rem;">CMS Authenticatie</span>
+        <h2>Inloggen als Beheerder</h2>
+        <p>Voer je inloggegevens in om content te beheren en live te publiceren.</p>
+      </div>
+
+      <form id="loginForm" onsubmit="event.preventDefault(); handleLoginSubmit();">
+        
+        <!-- 1. IN TE VULLEN: OWNER -->
+        <div class="form-group">
+          <label class="form-label" for="loginGhOwner">
+            <span>OWNER <span class="required">*</span></span>
+          </label>
+          <input type="text" id="loginGhOwner" class="form-control text-mono" placeholder="FILL IN USERNAME" required autofocus>
+        </div>
+
+        <!-- 2. IN TE VULLEN: KEY -->
+        <div class="form-group">
+          <label class="form-label" for="loginGhToken">
+            <span>KEY <span class="required">*</span></span>
+          </label>
+          <div class="input-with-button">
+            <input type="password" id="loginGhToken" class="form-control text-mono" placeholder="FILL IN PASSWORD" required autocomplete="current-password">
+            <button type="button" id="btnLoginToggleToken" class="btn btn-secondary btn-sm" title="Toon/verberg">👁️</button>
+          </div>
+        </div>
+
+        <button type="submit" id="btnLoginSubmit" class="btn btn-primary" style="width: 100%; padding: 0.75rem; margin-top: 1rem;">
+          Inloggen & Content Laden
+        </button>
+
+        <div style="text-align: center; margin-top: 1.25rem;">
+          <button type="button" id="btnContinueOffline" style="background:none; border:none; color:var(--text-dim); font-size:0.8rem; cursor:pointer; text-decoration:underline;">
+            Offline / Lokaal bewerken (zonder GitHub login)
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- AUTHENTICATED DASHBOARD (Hidden until logged in) -->
+    <div id="adminDashboard" style="display: none;">
+      
+      <!-- Status / Notification Alert Banner -->
+      <div id="statusBanner" style="display: none;" class="alert">
+        <div id="bannerMessage" style="flex: 1;"></div>
+        <button onclick="document.getElementById('statusBanner').style.display='none'" style="background:transparent; border:none; color:inherit; cursor:pointer;">✕</button>
+      </div>
+
+      <!-- Navigation Tabs - Neutral dots instead of icons -->
+      <nav class="nav-tabs" role="tablist">
+        <button class="tab-btn active" data-tab="tab-hero">
+          <span class="nav-dot"></span> Hero Banner
+        </button>
+        <button class="tab-btn" data-tab="tab-video">
+          <span class="nav-dot"></span> YouTube Video
+        </button>
+        <button class="tab-btn" data-tab="tab-latest">
+          <span class="nav-dot"></span> New Music
+        </button>
+        <button class="tab-btn" data-tab="tab-releases">
+          <span class="nav-dot"></span> Releases <span class="tab-badge" id="badgeReleasesCount">0</span>
+        </button>
+        <button class="tab-btn" data-tab="tab-social">
+          <span class="nav-dot"></span> Social Links
+        </button>
+      </nav>
+
+      <!-- TAB 1: HERO BANNER -->
+      <section id="tab-hero" class="tab-panel active">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">Grote Hero Foto & Tagline</h2>
+              <p class="card-description">Pas de hoofdafbeelding en ondertitel aan die direct bovenaan de site getoond worden.</p>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div>
+              <div class="form-group">
+                <label class="form-label" for="heroImage">Afbeelding URL of Pad <span class="required">*</span></label>
+                <input type="text" id="heroImage" class="form-control" placeholder="/img/hero.jpg of https://..." value="/img/hero.jpg">
+                
+                <!-- Upload button for Hero Image -->
+                <div class="upload-row">
+                  <input type="file" id="heroUploadInput" accept="image/*" style="display: none;">
+                  <button type="button" class="upload-btn" onclick="document.getElementById('heroUploadInput').click();">
+                    <span>📁</span> Upload nieuwe foto naar /img/
+                  </button>
+                  <span id="heroUploadStatus" class="upload-status"></span>
+                </div>
+                <p class="form-hint">Kies een afbeelding: deze wordt direct in de preview getoond en opgeslagen in <code>/img/</code>.</p>
+              </div>
+
+              <!-- Alignment & Positioning Controls for Hero -->
+              <div class="form-group" style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.4rem;">
+                  <label class="form-label" style="margin-bottom:0;">
+                    <span>Uitlijning Foto (Blijft Schermvullend)</span>
+                  </label>
+                  <span class="badge badge-gray" id="heroPosBadge">50% 50%</span>
+                </div>
+                <p class="form-hint" style="margin-bottom: 0.85rem;">
+                  De afbeelding blijft altijd 100% schermvullend binnen de resolutie. Lijn hier horizontaal (X) of verticaal (Y) uit zodat het hoofdonderwerp perfect in beeld staat:
+                </p>
+
+                <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+                  <!-- Horizontale Uitlijning -->
+                  <div style="background: rgba(255,255,255,0.02); padding: 0.65rem 0.85rem; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.05);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                      <span style="font-size: 0.775rem; color: var(--text-muted); font-weight: 600;">
+                        ↔ Horizontale Positie (X):
+                      </span>
+                      <span id="heroPosPercentLabelH" style="font-weight: 700; font-size: 0.775rem; color: var(--text-main);">50%</span>
+                    </div>
+                    <div style="display: flex; gap: 0.4rem; margin-bottom: 0.5rem;">
+                      <button type="button" class="btn btn-secondary btn-sm btn-hero-h" data-h="0">← Links (0%)</button>
+                      <button type="button" class="btn btn-secondary btn-sm btn-hero-h active" data-h="50">● Midden (50%)</button>
+                      <button type="button" class="btn btn-secondary btn-sm btn-hero-h" data-h="100">→ Rechts (100%)</button>
+                    </div>
+                    <input type="range" id="heroPosSliderH" min="0" max="100" value="50" style="width: 100%; accent-color: var(--accent); cursor: pointer;" title="Horizontale positie slider">
+                  </div>
+
+                  <!-- Verticale Uitlijning -->
+                  <div style="background: rgba(255,255,255,0.02); padding: 0.65rem 0.85rem; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.05);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                      <span style="font-size: 0.775rem; color: var(--text-muted); font-weight: 600;">
+                        ↕ Verticale Positie (Y):
+                      </span>
+                      <span id="heroPosPercentLabelV" style="font-weight: 700; font-size: 0.775rem; color: var(--text-main);">50%</span>
+                    </div>
+                    <div style="display: flex; gap: 0.4rem; margin-bottom: 0.5rem;">
+                      <button type="button" class="btn btn-secondary btn-sm btn-hero-v" data-v="0">↑ Boven (0%)</button>
+                      <button type="button" class="btn btn-secondary btn-sm btn-hero-v active" data-v="50">● Midden (50%)</button>
+                      <button type="button" class="btn btn-secondary btn-sm btn-hero-v" data-v="100">↓ Onder (100%)</button>
+                    </div>
+                    <input type="range" id="heroPosSliderV" min="0" max="100" value="50" style="width: 100%; accent-color: var(--accent); cursor: pointer;" title="Verticale positie slider">
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="heroSubtitle">Subtitel / Tagline</label>
+                <input type="text" id="heroSubtitle" class="form-control" placeholder="Reggae Artist" value="Reggae Artist">
+              </div>
+            </div>
+
+            <div>
+              <div class="preview-box">
+                <div class="preview-header">
+                  <span>Live Hero Preview</span>
+                  <span class="badge badge-gray">Aspect Cover</span>
+                </div>
+                <div class="hero-preview-canvas" id="heroCanvasContainer" style="cursor: crosshair; user-select: none; position: relative;">
+                  <img id="heroPreviewImg" src="/img/hero.jpg" alt="Hero Preview" style="width:100%; height:100%; object-fit:cover; object-position: 50% 50%; transition: object-position 0.08s ease; pointer-events: none;">
+                  <div id="heroFocusPin" style="position: absolute; left: 50%; top: 50%; width: 24px; height: 24px; border: 2px solid #ef4444; border-radius: 50%; box-shadow: 0 0 10px rgba(239, 68, 68, 0.9), inset 0 0 5px rgba(0,0,0,0.6); pointer-events: none; transform: translate(-50%, -50%); z-index: 10; transition: left 0.08s ease, top 0.08s ease;">
+                    <div style="width: 6px; height: 6px; background: #ffffff; border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"></div>
+                  </div>
+                  <div class="hero-preview-overlay" style="pointer-events: none;">
+                    <span style="font-weight: 800; font-size: 1.25rem; letter-spacing: 0.1em;">NOSJEMAN BIGYOUTH</span>
+                    <span id="heroPreviewSubtitle" class="hero-preview-tag">REGGAE ARTIST</span>
+                  </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: var(--text-dim); margin-top: 0.25rem;">
+                  <span>💡 Klik of versleep op het voorbeeld om uit te lijnen</span>
+                  <button type="button" id="btnResetHeroPos" class="btn btn-secondary btn-sm" style="font-size:0.7rem; padding: 0.2rem 0.5rem;" title="Herstel focuspunt naar het midden (50% 50%)">↺ Midden</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: YOUTUBE VIDEO -->
+      <section id="tab-video" class="tab-panel">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">Uitgelichte YouTube Video</h2>
+              <p class="card-description">Plak een YouTube link of Video ID. Het systeem zet dit automatisch om naar een responsive embed player.</p>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div>
+              <div class="form-group">
+                <label class="form-label" for="videoInputUrl">YouTube Video URL of ID <span class="required">*</span></label>
+                <input type="text" id="videoInputUrl" class="form-control" placeholder="https://www.youtube.com/watch?v=2rV53wNfkOg of 2rV53wNfkOg">
+                <p class="form-hint">Ondersteunt alle formaten: <code>youtube.com/watch?v=...</code>, <code>youtu.be/...</code>, Shorts of losse ID.</p>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="videoEmbedUrl">Gegenereerde Embed URL (Alleen-lezen)</label>
+                <input type="text" id="videoEmbedUrl" class="form-control text-mono" readonly style="opacity: 0.8; background: #0c0e14;">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="videoTitle">Video Toegankelijkheidstitel (Aria)</label>
+                <input type="text" id="videoTitle" class="form-control" placeholder="Nosjeman Bigyouth video player">
+              </div>
+            </div>
+
+            <div>
+              <div class="preview-box">
+                <div class="preview-header">
+                  <span>Live Video Player Preview</span>
+                  <span class="badge badge-gray">16:9 Embed</span>
+                </div>
+                <div class="video-preview-wrapper">
+                  <iframe id="videoPreviewIframe" src="about:blank" title="Video player preview" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: NEW MUSIC (LATEST RELEASE) -->
+      <section id="tab-latest" class="tab-panel">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">NEW MUSIC - Laatste Release</h2>
+              <p class="card-description">Beheer de uitgelichte single of album in de spotlight-sectie.</p>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div>
+              <div class="grid-2">
+                <div class="form-group">
+                  <label class="form-label" for="latestBadge">Badge Label</label>
+                  <input type="text" id="latestBadge" class="form-control" placeholder="LATEST RELEASE" value="LATEST RELEASE">
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="latestHeading">Koptekst</label>
+                  <input type="text" id="latestHeading" class="form-control" placeholder="NEW MUSIC" value="NEW MUSIC">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="latestTitle">Track / Release Titel <span class="required">*</span></label>
+                <input type="text" id="latestTitle" class="form-control" placeholder="Concrete Jungle">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="latestArtwork">Artwork Afbeelding URL / Pad <span class="required">*</span></label>
+                <input type="text" id="latestArtwork" class="form-control" placeholder="/img/album-cover.jpg">
+                
+                <!-- Upload button for Latest Release Artwork -->
+                <div class="upload-row">
+                  <input type="file" id="latestArtworkUploadInput" accept="image/*" style="display: none;">
+                  <button type="button" class="upload-btn" onclick="document.getElementById('latestArtworkUploadInput').click();">
+                    <span>📁</span> Upload nieuw artwork naar /img/
+                  </button>
+                  <span id="latestArtworkUploadStatus" class="upload-status"></span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="latestSpotify">Spotify Album/Track Link</label>
+                <input type="text" id="latestSpotify" class="form-control" placeholder="https://open.spotify.com/album/...">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="latestYoutube">YouTube Track Link</label>
+                <input type="text" id="latestYoutube" class="form-control" placeholder="https://www.youtube.com/watch?v=...">
+              </div>
+
+              <div class="grid-2">
+                <div class="form-group">
+                  <label class="form-label" for="latestListenBtn">Spotify Knop Tekst</label>
+                  <input type="text" id="latestListenBtn" class="form-control" placeholder="Listen to Concrete Jungle">
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="latestWatchBtn">YouTube Knop Tekst</label>
+                  <input type="text" id="latestWatchBtn" class="form-control" placeholder="Watch on YouTube">
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div class="preview-box">
+                <div class="preview-header">
+                  <span>Live Spotlight Preview</span>
+                </div>
+                <div style="background: #000; border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 1.5rem; text-align: center;">
+                  <p style="color: var(--accent); font-size: 0.75rem; letter-spacing: 0.3em; margin-bottom: 0.25rem;" id="previewLatestBadge">LATEST RELEASE</p>
+                  <h3 style="font-size: 1.75rem; font-weight: 800; letter-spacing: 0.05em; margin-bottom: 1.25rem;" id="previewLatestHeading">NEW MUSIC</h3>
+                  
+                  <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+                    <div style="width: 190px; height: 190px; aspect-ratio: 1 / 1; border-radius: var(--radius-sm); overflow: hidden; background: #111; box-shadow: 0 10px 25px rgba(239, 68, 68, 0.25); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; position: relative;">
+                      <img id="previewLatestImg" src="/img/album-cover.jpg" alt="Artwork" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;">
+                    </div>
+                    <div style="font-weight: 700; font-size: 1.1rem;" id="previewLatestTitle">Concrete Jungle</div>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem; width: 100%; max-width: 250px;">
+                      <div style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); padding: 0.5rem 1rem; border-radius: 4px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                        <span style="color: #22c55e;">🟢</span> <span id="previewLatestListenBtn">Listen to Concrete Jungle</span>
+                      </div>
+                      <div style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); padding: 0.5rem 1rem; border-radius: 4px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                        <span style="color: #ef4444;">▶</span> <span id="previewLatestWatchBtn">Watch on YouTube</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: RELEASES (DISCOGRAFIE) -->
+      <section id="tab-releases" class="tab-panel">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">Discografie & Releases</h2>
+              <p class="card-description">Voeg nieuwe releases toe, bewerk bestaande, verander de volgorde of verwijder items.</p>
+            </div>
+            <button id="btnAddRelease" class="btn btn-primary btn-sm">
+              <span>+</span> Release Toevoegen
+            </button>
+          </div>
+
+          <div id="releasesContainer">
+            <!-- Dynamic Release Cards Rendered Here -->
+          </div>
+
+          <div style="text-align: center; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px dashed var(--border-color);">
+            <button id="btnAddReleaseBottom" class="btn btn-secondary">
+              <span>+</span> Nog een release toevoegen
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 5: SOCIAL MEDIA LINKS -->
+      <section id="tab-social" class="tab-panel">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">Sociale Kanalen</h2>
+              <p class="card-description">Kanalen en streaming-links getoond in de header en footer van de website.</p>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label" for="socialSpotify">Spotify Artist URL</label>
+              <input type="text" id="socialSpotify" class="form-control" placeholder="https://open.spotify.com/artist/...">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="socialInstagram">Instagram Profiel</label>
+              <input type="text" id="socialInstagram" class="form-control" placeholder="https://instagram.com/...">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="socialTiktok">TikTok Profiel</label>
+              <input type="text" id="socialTiktok" class="form-control" placeholder="https://tiktok.com/@...">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="socialFacebook">Facebook Pagina</label>
+              <input type="text" id="socialFacebook" class="form-control" placeholder="https://facebook.com/...">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="socialYoutube">YouTube Kanaal</label>
+              <input type="text" id="socialYoutube" class="form-control" placeholder="https://www.youtube.com/@...">
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- Status Bar / Footer Info -->
+      <div class="status-bar">
+        <div class="status-indicator">
+          <div id="statusDot" class="status-dot"></div>
+          <span id="statusText">Gereed</span>
+        </div>
+        <div style="font-size: 0.75rem; color: var(--text-dim);" class="text-mono">
+          Commit SHA: <span id="currentShaDisplay">Nog niet geladen</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- COPYRIGHT FOOTER AT THE VERY BOTTOM OF ADMIN -->
+    <footer class="admin-page-footer">
+      <p>&copy; <span id="adminCopyrightYear">2026</span>. <span id="adminCopyrightText">NOSJEMAN BIGYOUTH. IZHIA ARTS. JUICED UNICORN. All rights reserved.</span></p>
+    </footer>
+
+  </main>
+
+  <!-- Toast Notification Stack -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- SCRIPT LOGIC -->
+  <script>
+    // Initial Fallback / Default Data
+    const DEFAULT_DATA = {
+      hero: {
+        image: "/img/hero.jpg",
+        subtitle: "Reggae Artist"
+      },
+      featuredVideo: {
+        youtubeUrl: "https://www.youtube.com/watch?v=2rV53wNfkOg",
+        embedUrl: "https://www.youtube.com/embed/2rV53wNfkOg",
+        title: "Nosjeman Bigyouth video player"
+      },
+      latestRelease: {
+        badge: "LATEST RELEASE",
+        heading: "NEW MUSIC",
+        title: "Concrete Jungle",
+        releaseDate: "2026",
+        description: "Concrete Jungle",
+        artwork: "/img/album-cover.jpg",
+        spotifyUrl: "https://open.spotify.com/album/6U3V60m3Bs7bo2vHsHQWjB",
+        youtubeUrl: "https://www.youtube.com/@nosjemanbigyouth",
+        listenButtonText: "Listen to Concrete Jungle",
+        watchButtonText: "Watch on YouTube"
+      },
+      releases: [
+        {
+          id: "rel-1",
+          title: "Concrete Jungle",
+          type: "Album",
+          year: "2026",
+          image: "/img/album-cover.jpg",
+          link: "https://open.spotify.com/album/6U3V60m3Bs7bo2vHsHQWjB"
+        },
+        {
+          id: "rel-2",
+          title: "Jah Army",
+          type: "Single",
+          year: "2025",
+          image: "/img/02.jpg",
+          link: "https://open.spotify.com/album/21u5DdOGTJSP5l9wsS0AZN"
+        },
+        {
+          id: "rel-3",
+          title: "Check Clean",
+          type: "Single",
+          year: "2025",
+          image: "/img/03.jpg",
+          link: "https://open.spotify.com/album/4ZCNBWFJeXvwHnB5RFEBZh"
+        },
+        {
+          id: "rel-4",
+          title: "Buss A Blank",
+          type: "Single",
+          year: "2023",
+          image: "/img/04.jpg",
+          link: "https://open.spotify.com/album/1Q4GHMpVDctmsYlDgHdua0"
+        }
+      ],
+      socialLinks: {
+        spotify: "https://open.spotify.com/artist/5pWOl8Mk1utpqJJ3ZL5O9H",
+        instagram: "https://instagram.com/nosjemanbigyouth",
+        tiktok: "https://tiktok.com/@nosjemanbigyouth",
+        facebook: "https://facebook.com/nosjeman.bigyouth",
+        youtube: "https://www.youtube.com/@nosjemanbigyouth"
+      },
+      footerCopyright: "NOSJEMAN BIGYOUTH. IZHIA ARTS. JUICED UNICORN. All rights reserved."
+    };
+
+    const CONFIG_KEY = 'nosjeman_cms_gh_config';
+    let currentData = JSON.parse(JSON.stringify(DEFAULT_DATA));
+    let currentSha = null;
+    let isSaving = false;
+
+    // Toast Notification helper
+    function showToast(title, desc, type = 'info', duration = 5000) {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      
+      const borderColor = type === 'success' ? '#10b981' : type === 'danger' ? '#ef4444' : type === 'warning' ? '#f59e0b' : '#3b82f6';
+      toast.style.borderLeft = `4px solid ${borderColor}`;
+
+      toast.innerHTML = `
+        <div class="toast-body">
+          <div class="toast-title">${title}</div>
+          <div class="toast-desc">${desc}</div>
+        </div>
+        <button class="toast-close" onclick="this.parentElement.remove()">✕</button>
+      `;
+
+      container.appendChild(toast);
+      setTimeout(() => {
+        if (toast.parentElement) toast.remove();
+      }, duration);
+    }
+
+    function showBanner(msg, type = 'info') {
+      const banner = document.getElementById('statusBanner');
+      const bannerMsg = document.getElementById('bannerMessage');
+      banner.className = `alert alert-${type}`;
+      bannerMsg.innerHTML = msg;
+      banner.style.display = 'flex';
+    }
+
+    function updateStatusIndicator(state, text) {
+      const dot = document.getElementById('statusDot');
+      const label = document.getElementById('statusText');
+      dot.className = `status-dot ${state}`;
+      label.innerText = text;
+    }
+
+    // Config Storage helpers
+    function getStoredConfig() {
+      const local = localStorage.getItem(CONFIG_KEY);
+      const session = sessionStorage.getItem(CONFIG_KEY);
+      const raw = local || session;
+      if (!raw) return { owner: 'nosjemanbigyouth', token: '', repo: 'nosjemanbigyouth/www', branch: 'main', filePath: 'public/data/content.json', remember: true };
+      try {
+        const parsed = JSON.parse(raw);
+        if (!parsed.owner && parsed.repo) {
+          parsed.owner = parsed.repo.split('/')[0] || 'nosjemanbigyouth';
+        }
+        if (!parsed.owner) parsed.owner = 'nosjemanbigyouth';
+        parsed.repo = `${parsed.owner}/www`;
+        parsed.branch = 'main';
+        parsed.filePath = 'public/data/content.json';
+        return parsed;
+      } catch (e) {
+        return { owner: 'nosjemanbigyouth', token: '', repo: 'nosjemanbigyouth/www', branch: 'main', filePath: 'public/data/content.json', remember: true };
+      }
+    }
+
+    function saveConfig(cfg) {
+      const dataStr = JSON.stringify(cfg);
+      if (cfg.remember) {
+        localStorage.setItem(CONFIG_KEY, dataStr);
+        sessionStorage.removeItem(CONFIG_KEY);
+      } else {
+        sessionStorage.setItem(CONFIG_KEY, dataStr);
+        localStorage.removeItem(CONFIG_KEY);
+      }
+    }
+
+    function clearConfig() {
+      localStorage.removeItem(CONFIG_KEY);
+      sessionStorage.removeItem(CONFIG_KEY);
+    }
+
+    // UTF-8 <-> Base64 helpers
+    function utf8ToBase64(str) {
+      return window.btoa(unescape(encodeURIComponent(str)));
+    }
+
+    function base64ToUtf8(str) {
+      return decodeURIComponent(escape(window.atob(str.replace(/\s/g, ''))));
+    }
+
+    function getGitHubHeaders(token) {
+      return {
+        'Accept': 'application/vnd.github+json',
+        'Authorization': `Bearer ${token}`,
+        'X-GitHub-Api-Version': '2022-11-28'
+      };
+    }
+
+    // YouTube Parser
+    function parseYouTubeUrl(input) {
+      if (!input) return { videoId: '', embedUrl: '' };
+      const trimmed = input.trim();
+      const match = trimmed.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})/);
+      if (match && match[1]) {
+        return {
+          videoId: match[1],
+          embedUrl: `https://www.youtube.com/embed/${match[1]}`
+        };
+      }
+      if (/^[\w-]{11}$/.test(trimmed)) {
+        return {
+          videoId: trimmed,
+          embedUrl: `https://www.youtube.com/embed/${trimmed}`
+        };
+      }
+      return { videoId: '', embedUrl: trimmed };
+    }
+
+    // IMAGE UPLOAD FUNCTIONALITY WITH INSTANT IN-MEMORY PREVIEW
+    async function uploadImageFile(file, statusEl, onUploaded) {
+      if (!file) return;
+      if (!file.type.startsWith('image/')) {
+        showToast('Ongeldig Bestand', 'Selecteer een geldig afbeeldingsbestand (JPG, PNG, WebP).', 'danger');
+        return;
+      }
+
+      if (statusEl) statusEl.innerText = 'Uploaden naar /img/...';
+      const cfg = getStoredConfig();
+
+      // Clean filename
+      const cleanName = file.name.toLowerCase().replace(/[^a-z0-9._-]/g, '-');
+      const timestamp = Date.now().toString().slice(-6);
+      const ext = cleanName.includes('.') ? cleanName.substring(cleanName.lastIndexOf('.')) : '.jpg';
+      const base = cleanName.includes('.') ? cleanName.substring(0, cleanName.lastIndexOf('.')) : cleanName;
+      const targetFileName = `${base}-${timestamp}${ext}`;
+
+      let localSuccess = false;
+
+      // 1. Try local serverless API endpoint (/api/upload)
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+        const res = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData
+        });
+        if (res.ok) {
+          localSuccess = true;
+        }
+      } catch (err) {
+        console.warn('Lokaal opslaan niet beschikbaar, overgaan naar browser data:', err);
+      }
+
+      // 2. Read file as Base64 for GitHub commit
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const base64Data = e.target.result.split(',')[1];
+        const targetPath = `/img/${targetFileName}`;
+
+        // If GitHub is connected, commit image directly to repo
+        if (cfg.token && cfg.repo) {
+          try {
+            if (statusEl) statusEl.innerText = 'Committen naar GitHub repo...';
+            const ghPath = `public/img/${targetFileName}`;
+            const ghUrl = `https://api.github.com/repos/${cfg.repo}/contents/${ghPath}`;
+
+            const response = await fetch(ghUrl, {
+              method: 'PUT',
+              headers: {
+                ...getGitHubHeaders(cfg.token),
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                message: `Upload ${targetFileName} via Admin Panel`,
+                content: base64Data,
+                branch: cfg.branch || 'main'
+              })
+            });
+
+            if (response.ok) {
+              showToast('Afbeelding Gecommit', `Gecommit naar GitHub als ${targetPath}`, 'success');
+            } else {
+              const errJson = await response.json().catch(() => ({}));
+              console.warn('GitHub image commit notice:', errJson.message);
+            }
+          } catch (ghErr) {
+            console.error('Error committing image to GitHub:', ghErr);
+          }
+        }
+
+        if (statusEl) statusEl.innerText = `Geüpload: ${targetPath}`;
+        showToast('Afbeelding Klaargezet', `Pad ingesteld op ${targetPath}`, 'success');
+        onUploaded(targetPath);
+      };
+
+      reader.readAsDataURL(file);
+    }
+
+    // RENDER RELEASES DISCOGRAPHY
+    function renderReleasesList() {
+      const container = document.getElementById('releasesContainer');
+      container.innerHTML = '';
+      const releases = currentData.releases || [];
+
+      document.getElementById('badgeReleasesCount').innerText = releases.length;
+
+      releases.forEach((rel, index) => {
+        const item = document.createElement('div');
+        item.className = 'release-item';
+        item.dataset.index = index;
+
+        item.innerHTML = `
+          <div class="release-header">
+            <div style="display:flex; align-items:center; gap:0.5rem;">
+              <span class="release-number-badge">#${index + 1}</span>
+              <span style="font-weight:700; font-size:0.95rem;">${rel.title || 'Nieuwe Release'}</span>
+              <span style="font-size:0.75rem; color:var(--text-dim);">(${rel.type || 'Single'} - ${rel.year || '2026'})</span>
+            </div>
+            <div class="release-actions">
+              <button type="button" class="btn btn-secondary btn-sm btn-move-up" title="Omhoog verplaatsen" ${index === 0 ? 'disabled' : ''}>▲</button>
+              <button type="button" class="btn btn-secondary btn-sm btn-move-down" title="Omlaag verplaatsen" ${index === releases.length - 1 ? 'disabled' : ''}>▼</button>
+              <button type="button" class="btn btn-outline-danger btn-sm btn-delete-release" title="Verwijderen">Verwijder</button>
+            </div>
+          </div>
+
+          <div class="release-content-grid">
+            <div>
+              <div class="release-thumb">
+                <img src="${rel.image || '/img/album-cover.jpg'}" alt="Cover">
+              </div>
+              <input type="file" class="release-file-input" accept="image/*" style="display:none;">
+              <button type="button" class="upload-btn btn-upload-release-cover" style="width:100%; margin-top:0.4rem; justify-content:center;">
+                Cover Uploaden
+              </button>
+              <div class="release-upload-status upload-status" style="text-align:center; margin-top:0.2rem;"></div>
+            </div>
+
+            <div class="grid-2">
+              <div class="form-group" style="margin-bottom:0.75rem;">
+                <label class="form-label">Titel <span class="required">*</span></label>
+                <input type="text" class="form-control rel-field-title" value="${rel.title || ''}" placeholder="Bijv. Concrete Jungle">
+              </div>
+
+              <div class="form-group" style="margin-bottom:0.75rem;">
+                <label class="form-label">Type</label>
+                <select class="form-control rel-field-type">
+                  <option value="Single" ${rel.type === 'Single' ? 'selected' : ''}>Single</option>
+                  <option value="EP" ${rel.type === 'EP' ? 'selected' : ''}>EP</option>
+                  <option value="Album" ${rel.type === 'Album' ? 'selected' : ''}>Album</option>
+                </select>
+              </div>
+
+              <div class="form-group" style="margin-bottom:0.75rem;">
+                <label class="form-label">Releasejaar</label>
+                <input type="text" class="form-control rel-field-year" value="${rel.year || '2026'}" placeholder="2026">
+              </div>
+
+              <div class="form-group" style="margin-bottom:0.75rem;">
+                <label class="form-label">Artwork Pad / URL</label>
+                <input type="text" class="form-control rel-field-image" value="${rel.image || ''}" placeholder="/img/album-cover.jpg">
+              </div>
+
+              <div class="form-group" style="grid-column: 1 / -1; margin-bottom:0;">
+                <label class="form-label">Spotify / Streaming Link</label>
+                <input type="text" class="form-control rel-field-link" value="${rel.link || ''}" placeholder="https://open.spotify.com/album/...">
+              </div>
+            </div>
+          </div>
+        `;
+
+        // Event listeners for this release item
+        const titleInput = item.querySelector('.rel-field-title');
+        const typeInput = item.querySelector('.rel-field-type');
+        const yearInput = item.querySelector('.rel-field-year');
+        const imageInput = item.querySelector('.rel-field-image');
+        const linkInput = item.querySelector('.rel-field-link');
+        const thumbImg = item.querySelector('.release-thumb img');
+        const fileInput = item.querySelector('.release-file-input');
+        const uploadBtn = item.querySelector('.btn-upload-release-cover');
+        const uploadStatus = item.querySelector('.release-upload-status');
+
+        titleInput.addEventListener('input', () => { currentData.releases[index].title = titleInput.value; });
+        typeInput.addEventListener('change', () => { currentData.releases[index].type = typeInput.value; });
+        yearInput.addEventListener('input', () => { currentData.releases[index].year = yearInput.value; });
+        imageInput.addEventListener('input', () => {
+          currentData.releases[index].image = imageInput.value;
+          thumbImg.src = imageInput.value;
+        });
+        linkInput.addEventListener('input', () => { currentData.releases[index].link = linkInput.value; });
+
+        // Upload release cover with instant preview
+        uploadBtn.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', () => {
+          if (fileInput.files && fileInput.files[0]) {
+            const file = fileInput.files[0];
+            // 1. Instant preview from browser memory
+            thumbImg.src = URL.createObjectURL(file);
+
+            // 2. Upload file
+            uploadImageFile(file, uploadStatus, (uploadedUrl) => {
+              imageInput.value = uploadedUrl;
+              currentData.releases[index].image = uploadedUrl;
+            });
+          }
+        });
+
+        // Reorder & Delete
+        item.querySelector('.btn-move-up').addEventListener('click', () => {
+          if (index > 0) {
+            const temp = currentData.releases[index];
+            currentData.releases[index] = currentData.releases[index - 1];
+            currentData.releases[index - 1] = temp;
+            renderReleasesList();
+          }
+        });
+
+        item.querySelector('.btn-move-down').addEventListener('click', () => {
+          if (index < currentData.releases.length - 1) {
+            const temp = currentData.releases[index];
+            currentData.releases[index] = currentData.releases[index + 1];
+            currentData.releases[index + 1] = temp;
+            renderReleasesList();
+          }
+        });
+
+        item.querySelector('.btn-delete-release').addEventListener('click', () => {
+          if (confirm(`Weet je zeker dat je release "${rel.title || 'deze release'}" wilt verwijderen?`)) {
+            currentData.releases.splice(index, 1);
+            renderReleasesList();
+            showToast('Release Verwijderd', 'Item verwijderd uit discografie.', 'info');
+          }
+        });
+
+        container.appendChild(item);
+      });
+    }
+
+    function addNewRelease() {
+      if (!Array.isArray(currentData.releases)) currentData.releases = [];
+      const newId = 'rel-' + Date.now();
+      currentData.releases.push({
+        id: newId,
+        title: 'Nieuwe Release',
+        type: 'Single',
+        year: new Date().getFullYear().toString(),
+        image: '/img/album-cover.jpg',
+        link: 'https://open.spotify.com/'
+      });
+      renderReleasesList();
+      showToast('Release Toegevoegd', 'Nieuwe lege release onderaan toegevoegd.', 'success');
+      const container = document.getElementById('releasesContainer');
+      if (container.lastElementChild) container.lastElementChild.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Hero Image Alignment Helpers
+    let currentHeroPosH = 50; // 0 to 100%
+    let currentHeroPosV = 50; // 0 to 100%
+
+    function updateHeroPreviewPosition() {
+      const posString = `${currentHeroPosH}% ${currentHeroPosV}%`;
+      const img = document.getElementById('heroPreviewImg');
+      if (img) {
+        img.style.objectPosition = posString;
+      }
+      const pin = document.getElementById('heroFocusPin');
+      if (pin) {
+        pin.style.left = `${currentHeroPosH}%`;
+        pin.style.top = `${currentHeroPosV}%`;
+      }
+      const sliderV = document.getElementById('heroPosSliderV');
+      if (sliderV) sliderV.value = currentHeroPosV;
+      const sliderH = document.getElementById('heroPosSliderH');
+      if (sliderH) sliderH.value = currentHeroPosH;
+
+      const labelV = document.getElementById('heroPosPercentLabelV');
+      if (labelV) labelV.innerText = `${currentHeroPosV}%`;
+      const labelH = document.getElementById('heroPosPercentLabelH');
+      if (labelH) labelH.innerText = `${currentHeroPosH}%`;
+
+      const badge = document.getElementById('heroPosBadge');
+      if (badge) {
+        const hWord = currentHeroPosH < 33 ? 'Links' : currentHeroPosH > 66 ? 'Rechts' : 'Midden';
+        const vWord = currentHeroPosV < 33 ? 'Boven' : currentHeroPosV > 66 ? 'Onder' : 'Midden';
+        badge.innerText = `${hWord} / ${vWord} (${currentHeroPosH}% ${currentHeroPosV}%)`;
+      }
+
+      // Update button active state
+      document.querySelectorAll('.btn-hero-v').forEach(b => {
+        const v = parseInt(b.dataset.v, 10);
+        const matches = (v === 0 && currentHeroPosV <= 15) ||
+                        (v === 100 && currentHeroPosV >= 85) ||
+                        (v === 50 && currentHeroPosV >= 35 && currentHeroPosV <= 65);
+        b.classList.toggle('active', matches);
+      });
+
+      document.querySelectorAll('.btn-hero-h').forEach(b => {
+        const h = parseInt(b.dataset.h, 10);
+        const matches = (h === 0 && currentHeroPosH <= 15) ||
+                        (h === 100 && currentHeroPosH >= 85) ||
+                        (h === 50 && currentHeroPosH >= 35 && currentHeroPosH <= 65);
+        b.classList.toggle('active', matches);
+      });
+    }
+
+    function applyHeroPosition(posStr) {
+      if (!posStr) posStr = '50% 50%';
+      const parts = posStr.trim().split(/\s+/);
+      if (parts.length === 1) {
+        if (parts[0] === 'top') { currentHeroPosV = 0; currentHeroPosH = 50; }
+        else if (parts[0] === 'bottom') { currentHeroPosV = 100; currentHeroPosH = 50; }
+        else if (parts[0] === 'left') { currentHeroPosV = 50; currentHeroPosH = 0; }
+        else if (parts[0] === 'right') { currentHeroPosV = 50; currentHeroPosH = 100; }
+        else if (parts[0].endsWith('%')) { currentHeroPosV = parseInt(parts[0], 10) || 50; currentHeroPosH = 50; }
+        else { currentHeroPosV = 50; currentHeroPosH = 50; }
+      } else {
+        // Horizontal
+        if (parts[0] === 'left') currentHeroPosH = 0;
+        else if (parts[0] === 'right') currentHeroPosH = 100;
+        else if (parts[0] === 'center') currentHeroPosH = 50;
+        else if (parts[0].endsWith('%')) currentHeroPosH = Math.max(0, Math.min(100, parseInt(parts[0], 10) || 50));
+        else currentHeroPosH = 50;
+
+        // Vertical
+        if (parts[1] === 'top') currentHeroPosV = 0;
+        else if (parts[1] === 'bottom') currentHeroPosV = 100;
+        else if (parts[1] === 'center') currentHeroPosV = 50;
+        else if (parts[1].endsWith('%')) currentHeroPosV = Math.max(0, Math.min(100, parseInt(parts[1], 10) || 50));
+        else currentHeroPosV = 50;
+      }
+      updateHeroPreviewPosition();
+    }
+
+    function getHeroPositionValue() {
+      return `${currentHeroPosH}% ${currentHeroPosV}%`;
+    }
+
+    // FORM POPULATION & SYNCHRONIZATION
+    function populateForm(data) {
+      if (!data) return;
+      currentData = JSON.parse(JSON.stringify(data));
+
+      // Hero
+      const hero = currentData.hero || {};
+      document.getElementById('heroImage').value = hero.image || '';
+      document.getElementById('heroSubtitle').value = hero.subtitle || '';
+      document.getElementById('heroPreviewImg').src = hero.image || '/img/hero.jpg';
+      document.getElementById('heroPreviewSubtitle').innerText = (hero.subtitle || 'REGGAE ARTIST').toUpperCase();
+      applyHeroPosition(hero.position || 'center 50%');
+
+      // Video
+      const video = currentData.featuredVideo || {};
+      document.getElementById('videoInputUrl').value = video.youtubeUrl || '';
+      document.getElementById('videoEmbedUrl').value = video.embedUrl || '';
+      document.getElementById('videoTitle').value = video.title || '';
+      if (video.embedUrl) {
+        document.getElementById('videoPreviewIframe').src = video.embedUrl;
+      }
+
+      // Latest Release
+      const latest = currentData.latestRelease || {};
+      document.getElementById('latestBadge').value = latest.badge || 'LATEST RELEASE';
+      document.getElementById('latestHeading').value = latest.heading || 'NEW MUSIC';
+      document.getElementById('latestTitle').value = latest.title || '';
+      document.getElementById('latestArtwork').value = latest.artwork || '';
+      document.getElementById('latestSpotify').value = latest.spotifyUrl || '';
+      document.getElementById('latestYoutube').value = latest.youtubeUrl || '';
+      document.getElementById('latestListenBtn').value = latest.listenButtonText || '';
+      document.getElementById('latestWatchBtn').value = latest.watchButtonText || '';
+
+      document.getElementById('previewLatestBadge').innerText = latest.badge || 'LATEST RELEASE';
+      document.getElementById('previewLatestHeading').innerText = latest.heading || 'NEW MUSIC';
+      document.getElementById('previewLatestTitle').innerText = latest.title || 'Titel';
+      document.getElementById('previewLatestImg').src = latest.artwork || '/img/album-cover.jpg';
+      document.getElementById('previewLatestListenBtn').innerText = latest.listenButtonText || `Listen to ${latest.title || 'Track'}`;
+      document.getElementById('previewLatestWatchBtn').innerText = latest.watchButtonText || 'Watch on YouTube';
+
+      // Releases
+      renderReleasesList();
+
+      // Social Links
+      const soc = currentData.socialLinks || {};
+      document.getElementById('socialSpotify').value = soc.spotify || '';
+      document.getElementById('socialInstagram').value = soc.instagram || '';
+      document.getElementById('socialTiktok').value = soc.tiktok || '';
+      document.getElementById('socialFacebook').value = soc.facebook || '';
+      document.getElementById('socialYoutube').value = soc.youtube || '';
+
+      // Footer Copyright (Vast en niet-aanpasbaar)
+      const copy = 'NOSJEMAN BIGYOUTH. IZHIA ARTS. JUICED UNICORN. All rights reserved.';
+      currentData.footerCopyright = copy;
+      const cpEl = document.getElementById('adminCopyrightText');
+      if (cpEl) cpEl.innerText = copy;
+      const yrEl = document.getElementById('adminCopyrightYear');
+      if (yrEl) yrEl.innerText = new Date().getFullYear();
+    }
+
+    function collectFormData() {
+      // Hero
+      currentData.hero = {
+        image: document.getElementById('heroImage').value.trim() || '/img/hero.jpg',
+        subtitle: document.getElementById('heroSubtitle').value.trim() || 'Reggae Artist',
+        position: getHeroPositionValue()
+      };
+
+      // Video
+      const videoInput = document.getElementById('videoInputUrl').value.trim();
+      const parsed = parseYouTubeUrl(videoInput);
+      currentData.featuredVideo = {
+        youtubeUrl: videoInput,
+        embedUrl: parsed.embedUrl || document.getElementById('videoEmbedUrl').value.trim(),
+        title: document.getElementById('videoTitle').value.trim() || 'Nosjeman Bigyouth video player'
+      };
+
+      // Latest Release
+      currentData.latestRelease = {
+        badge: document.getElementById('latestBadge').value.trim() || 'LATEST RELEASE',
+        heading: document.getElementById('latestHeading').value.trim() || 'NEW MUSIC',
+        title: document.getElementById('latestTitle').value.trim() || 'Concrete Jungle',
+        releaseDate: new Date().getFullYear().toString(),
+        description: document.getElementById('latestTitle').value.trim(),
+        artwork: document.getElementById('latestArtwork').value.trim() || '/img/album-cover.jpg',
+        spotifyUrl: document.getElementById('latestSpotify').value.trim(),
+        youtubeUrl: document.getElementById('latestYoutube').value.trim(),
+        listenButtonText: document.getElementById('latestListenBtn').value.trim() || `Listen to ${document.getElementById('latestTitle').value.trim()}`,
+        watchButtonText: document.getElementById('latestWatchBtn').value.trim() || 'Watch on YouTube'
+      };
+
+      // Releases are updated in-place via currentData.releases
+      if (!Array.isArray(currentData.releases)) currentData.releases = [];
+
+      // Social Links
+      currentData.socialLinks = {
+        spotify: document.getElementById('socialSpotify').value.trim(),
+        instagram: document.getElementById('socialInstagram').value.trim(),
+        tiktok: document.getElementById('socialTiktok').value.trim(),
+        facebook: document.getElementById('socialFacebook').value.trim(),
+        youtube: document.getElementById('socialYoutube').value.trim()
+      };
+
+      // Footer Copyright (Vast en niet-aanpasbaar)
+      currentData.footerCopyright = 'NOSJEMAN BIGYOUTH. IZHIA ARTS. JUICED UNICORN. All rights reserved.';
+
+      return currentData;
+    }
+
+    // GITHUB API SYNC & FETCH
+    async function fetchFromGitHub(silent = false) {
+      const cfg = getStoredConfig();
+      if (!cfg.token || !cfg.repo) {
+        tryLocalFetch();
+        return;
+      }
+
+      updateStatusIndicator('syncing', 'Bezig met ophalen van GitHub...');
+      const cleanPath = (cfg.filePath || 'public/data/content.json').replace(/^\/+/, '');
+      const url = `https://api.github.com/repos/${cfg.repo}/contents/${cleanPath}?ref=${encodeURIComponent(cfg.branch || 'main')}&t=${Date.now()}`;
+
+      try {
+        const response = await fetch(url, {
+          headers: getGitHubHeaders(cfg.token)
+        });
+
+        if (response.status === 401) {
+          throw new Error('Ongeldige GitHub Key / Token. Controleer je PAT.');
+        } else if (response.status === 403) {
+          throw new Error('Geen toegangsrechten (403). Heeft je token "Contents: Read and write" permissie?');
+        } else if (response.status === 404) {
+          // 1. Controleer of het bestand elders bestaat (bijv. data/content.json)
+          const altPath = cleanPath === 'public/data/content.json' ? 'data/content.json' : 'public/data/content.json';
+          try {
+            const altRes = await fetch(`https://api.github.com/repos/${cfg.repo}/contents/${altPath}?ref=${encodeURIComponent(cfg.branch || 'main')}&t=${Date.now()}`, {
+              headers: getGitHubHeaders(cfg.token)
+            });
+            if (altRes.ok) {
+              const altData = await altRes.json();
+              currentSha = altData.sha;
+              cfg.filePath = altPath;
+              saveConfig(cfg);
+              document.getElementById('currentShaDisplay').innerText = altData.sha.substring(0, 7);
+              const decodedContent = base64ToUtf8(altData.content);
+              populateForm(JSON.parse(decodedContent));
+              updateStatusIndicator('online', `Verbonden met ${cfg.repo} (${altPath})`);
+              if (!silent) {
+                showToast('Live Data Geladen', `Inhoud opgehaald van GitHub (${altPath}).`, 'success');
+              }
+              return;
+            }
+          } catch (e) {}
+
+          // 2. Bestand bestaat nog nergens op GitHub: maak public/data/content.json direct automatisch aan!
+          updateStatusIndicator('syncing', 'Bestand aanmaken op GitHub...');
+          const initialData = currentData || DEFAULT_DATA;
+          const initialContent = JSON.stringify(initialData, null, 2);
+
+          try {
+            const initRes = await fetch(`https://api.github.com/repos/${cfg.repo}/contents/${cleanPath}`, {
+              method: 'PUT',
+              headers: {
+                ...getGitHubHeaders(cfg.token),
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                message: 'Initialize public/data/content.json via Admin Panel',
+                content: utf8ToBase64(initialContent),
+                branch: cfg.branch || 'main'
+              })
+            });
+
+            if (initRes.ok || initRes.status === 201) {
+              const initData = await initRes.json();
+              currentSha = initData.content?.sha || null;
+              if (currentSha) {
+                document.getElementById('currentShaDisplay').innerText = currentSha.substring(0, 7);
+              }
+              populateForm(initialData);
+              updateStatusIndicator('online', `Verbonden met ${cfg.repo} (${cfg.branch || 'main'})`);
+              showToast('Bestand Aangemaakt', `${cleanPath} is direct aangemaakt op GitHub!`, 'success', 6000);
+              return;
+            }
+          } catch (initErr) {
+            console.warn('Auto-init failed:', initErr);
+          }
+
+          currentSha = null;
+          document.getElementById('currentShaDisplay').innerText = 'Nieuw bestand';
+          updateStatusIndicator('offline', 'Nog niet gecommit');
+          tryLocalFetch();
+          return;
+        } else if (!response.ok) {
+          throw new Error(`GitHub API fout (${response.status}): ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        currentSha = data.sha;
+        document.getElementById('currentShaDisplay').innerText = data.sha.substring(0, 7);
+
+        const decodedContent = base64ToUtf8(data.content);
+        const parsed = JSON.parse(decodedContent);
+
+        populateForm(parsed);
+        updateStatusIndicator('online', `Verbonden met ${cfg.repo} (${cfg.branch || 'main'})`);
+
+        if (!silent) {
+          showToast('Live Data Geladen', `Inhoud succesvol opgehaald van GitHub (commit: ${data.sha.substring(0, 7)}).`, 'success');
+        }
+      } catch (err) {
+        console.error('Fetch error:', err);
+        updateStatusIndicator('offline', 'Fout bij ophalen');
+        showToast('Fout bij Ophalen', err.message, 'danger', 7000);
+        showBanner(`<strong>Fout bij laden van GitHub:</strong> ${err.message}`, 'danger');
+        tryLocalFetch();
+      }
+    }
+
+    async function tryLocalFetch() {
+      try {
+        const res = await fetch(`/data/content.json?t=${Date.now()}`);
+        if (res.ok) {
+          const localData = await res.json();
+          populateForm(localData);
+          updateStatusIndicator('online', 'Lokale content ingeladen');
+        }
+      } catch (e) {
+        populateForm(DEFAULT_DATA);
+      }
+    }
+
+    // PUBLISH (COMMIT) TO GITHUB
+    async function publishToGitHub() {
+      if (isSaving) return;
+
+      const cfg = getStoredConfig();
+
+      if (!cfg.token) {
+        showToast('Key Ontbreekt', 'Log eerst in met een geldige GitHub Key.', 'danger');
+        lockDashboard();
+        return;
+      }
+
+      if (!cfg.repo || !cfg.repo.includes('/')) {
+        showToast('Repo Ongeldig', 'Herlaad en log opnieuw in met je gebruikersnaam.', 'danger');
+        lockDashboard();
+        return;
+      }
+
+      const dataToSave = collectFormData();
+      let jsonString;
+      try {
+        jsonString = JSON.stringify(dataToSave, null, 2);
+      } catch (err) {
+        showToast('JSON Fout', 'Kon formulier niet converteren naar JSON: ' + err.message, 'danger');
+        return;
+      }
+
+      isSaving = true;
+      const btn = document.getElementById('btnPublish');
+      const originalText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = `<span>⏳</span> Publiceren...`;
+      updateStatusIndicator('syncing', 'Committen naar GitHub...');
+
+      const cleanPath = (cfg.filePath || 'public/data/content.json').replace(/^\/+/, '');
+      const url = `https://api.github.com/repos/${cfg.repo}/contents/${cleanPath}`;
+
+      const payload = {
+        message: `Update website content via Admin Panel [${new Date().toLocaleTimeString('nl-NL')}]`,
+        content: utf8ToBase64(jsonString),
+        branch: cfg.branch || 'main'
+      };
+
+      if (currentSha) {
+        payload.sha = currentSha;
+      }
+
+      try {
+        const response = await fetch(url, {
+          method: 'PUT',
+          headers: {
+            ...getGitHubHeaders(cfg.token),
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const resData = await response.json();
+
+        if (response.status === 409) {
+          throw new Error('Bestandsconflict (409): Het bestand op GitHub is tussentijds gewijzigd. Klik op "Herladen" en probeer opnieuw.');
+        } else if (response.status === 401) {
+          throw new Error('Niet geautoriseerd (401): Je GitHub Token is ongeldig.');
+        } else if (response.status === 403) {
+          throw new Error('Geen schrijfrechten (403): Zorg dat je token "Contents: Read and write" rechten heeft.');
+        } else if (!response.ok) {
+          throw new Error(resData.message || `Fout van GitHub API (${response.status})`);
+        }
+
+        currentSha = resData.content?.sha || null;
+        if (currentSha) {
+          document.getElementById('currentShaDisplay').innerText = currentSha.substring(0, 7);
+        }
+
+        updateStatusIndicator('online', 'Gepubliceerd om ' + new Date().toLocaleTimeString());
+        showBanner(`
+          <div>
+            <strong>🎉 Wijzigingen succesvol gepubliceerd naar GitHub!</strong><br>
+            GitHub Pages / Vercel zet de update binnen circa <strong>1 minuut</strong> live op de website.
+          </div>
+        `, 'success');
+
+        showToast('Gepubliceerd!', 'Content is gecommit naar GitHub. Live binnen ~1 minuut.', 'success', 8000);
+
+      } catch (err) {
+        console.error('Publish error:', err);
+        updateStatusIndicator('offline', 'Publicatie mislukt');
+        showToast('Publicatie Mislukt', err.message, 'danger', 8000);
+        showBanner(`<strong>Publicatie mislukt:</strong> ${err.message}`, 'danger');
+      } finally {
+        isSaving = false;
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+      }
+    }
+
+    // LOGIN & AUTH FLOW
+    async function handleLoginSubmit() {
+      const owner = (document.getElementById('loginGhOwner').value.trim() || 'nosjemanbigyouth').replace(/\/+.*$/, '');
+      const token = document.getElementById('loginGhToken').value.trim();
+      const repo = `${owner}/www`;
+      const branch = 'main';
+      const filePath = 'public/data/content.json';
+      const remember = true;
+
+      if (!owner) {
+        showToast('Owner Vereist', 'Vul de GitHub Owner naam in (bijv. nosjemanbigyouth).', 'warning');
+        document.getElementById('loginGhOwner').focus();
+        return;
+      }
+
+      if (!token) {
+        showToast('Key Vereist', 'Voer je GitHub Key in.', 'warning');
+        document.getElementById('loginGhToken').focus();
+        return;
+      }
+
+      const submitBtn = document.getElementById('btnLoginSubmit');
+      submitBtn.disabled = true;
+      submitBtn.innerText = 'Verbinding Verifiëren...';
+
+      try {
+        // Verify User
+        const userRes = await fetch('https://api.github.com/user', { headers: getGitHubHeaders(token) });
+        if (!userRes.ok) throw new Error('De ingevoerde Key is ongeldig.');
+        const user = await userRes.json();
+
+        // Verify Repo (owner/www)
+        const repoRes = await fetch(`https://api.github.com/repos/${repo}`, { headers: getGitHubHeaders(token) });
+        if (!repoRes.ok) throw new Error(`Repository "${repo}" niet gevonden of ontoegankelijk voor deze Key.`);
+        const repoData = await repoRes.json();
+
+        // Save config
+        saveConfig({ owner, token, repo, branch, filePath, remember });
+
+        // Unlock dashboard
+        unlockDashboard(user.login);
+        showToast('Ingelogd!', `Verbonden met ${repo} als @${user.login}.`, 'success');
+
+        // Fetch live content
+        fetchFromGitHub(false);
+
+      } catch (err) {
+        showToast('Inloggen Mislukt', err.message, 'danger', 7000);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerText = 'Inloggen & Content Laden';
+      }
+    }
+
+    function unlockDashboard(username = null) {
+      document.getElementById('loginGate').style.display = 'none';
+      document.getElementById('adminDashboard').style.display = 'block';
+      document.getElementById('btnReload').style.display = 'inline-flex';
+      document.getElementById('btnPublish').style.display = 'inline-flex';
+      document.getElementById('btnTopLogout').style.display = 'inline-flex';
+
+      if (username) {
+        document.getElementById('btnTopLogout').innerText = `Uitloggen (@${username})`;
+      }
+    }
+
+    function lockDashboard() {
+      clearConfig();
+      document.getElementById('loginGhOwner').value = '';
+      document.getElementById('loginGhToken').value = '';
+      document.getElementById('adminDashboard').style.display = 'none';
+      document.getElementById('loginGate').style.display = 'block';
+      document.getElementById('btnReload').style.display = 'none';
+      document.getElementById('btnPublish').style.display = 'none';
+      document.getElementById('btnTopLogout').style.display = 'none';
+      showToast('Uitgelogd', 'Je sessie en key zijn veilig gewist.', 'info');
+    }
+
+    // ATTACH EVENT LISTENERS
+    document.addEventListener('DOMContentLoaded', () => {
+      // Tab navigation
+      const tabButtons = document.querySelectorAll('.tab-btn');
+      tabButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          tabButtons.forEach(b => b.classList.remove('active'));
+          document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+          btn.classList.add('active');
+          const panel = document.getElementById(btn.dataset.tab);
+          if (panel) panel.classList.add('active');
+        });
+      });
+
+      // Hero inputs & live preview
+      document.getElementById('heroImage').addEventListener('input', (e) => {
+        document.getElementById('heroPreviewImg').src = e.target.value;
+      });
+      document.getElementById('heroSubtitle').addEventListener('input', (e) => {
+        document.getElementById('heroPreviewSubtitle').innerText = (e.target.value || 'REGGAE ARTIST').toUpperCase();
+      });
+
+      // Hero Image Upload with INSTANT in-memory preview
+      document.getElementById('heroUploadInput').addEventListener('change', (e) => {
+        if (e.target.files && e.target.files[0]) {
+          const file = e.target.files[0];
+          // 1. Direct in-memory blob URL (never broken, 100% instant)
+          const localBlob = URL.createObjectURL(file);
+          document.getElementById('heroPreviewImg').src = localBlob;
+
+          // 2. Upload and save path
+          uploadImageFile(file, document.getElementById('heroUploadStatus'), (url) => {
+            document.getElementById('heroImage').value = url;
+          });
+        }
+      });
+
+      // Hero image error fallback to ensure preview never breaks
+      const heroPreviewImgEl = document.getElementById('heroPreviewImg');
+      if (heroPreviewImgEl) {
+        heroPreviewImgEl.addEventListener('error', () => {
+          heroPreviewImgEl.src = '/img/hero.jpg';
+        });
+      }
+
+      // Hero alignment buttons (Vertical)
+      document.querySelectorAll('.btn-hero-v').forEach(btn => {
+        btn.addEventListener('click', () => {
+          currentHeroPosV = parseInt(btn.dataset.v, 10);
+          updateHeroPreviewPosition();
+        });
+      });
+
+      // Hero alignment buttons (Horizontal)
+      document.querySelectorAll('.btn-hero-h').forEach(btn => {
+        btn.addEventListener('click', () => {
+          currentHeroPosH = parseInt(btn.dataset.h, 10);
+          updateHeroPreviewPosition();
+        });
+      });
+
+      // Hero Horizontal Slider
+      const heroSliderH = document.getElementById('heroPosSliderH');
+      if (heroSliderH) {
+        heroSliderH.addEventListener('input', (e) => {
+          currentHeroPosH = parseInt(e.target.value, 10);
+          updateHeroPreviewPosition();
+        });
+      }
+
+      // Hero Vertical Slider
+      const heroSliderV = document.getElementById('heroPosSliderV');
+      if (heroSliderV) {
+        heroSliderV.addEventListener('input', (e) => {
+          currentHeroPosV = parseInt(e.target.value, 10);
+          updateHeroPreviewPosition();
+        });
+      }
+
+      // Hero canvas click & drag focal point positioning
+      const heroCanvas = document.getElementById('heroCanvasContainer');
+      let isDraggingHeroCanvas = false;
+
+      function updateFocalPointFromEvent(e) {
+        if (!heroCanvas) return;
+        const rect = heroCanvas.getBoundingClientRect();
+        const clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : null);
+        const clientY = e.clientY !== undefined ? e.clientY : (e.touches && e.touches[0] ? e.touches[0].clientY : null);
+        if (clientX === null || clientY === null) return;
+
+        let x = Math.round(((clientX - rect.left) / rect.width) * 100);
+        let y = Math.round(((clientY - rect.top) / rect.height) * 100);
+        currentHeroPosH = Math.max(0, Math.min(100, x));
+        currentHeroPosV = Math.max(0, Math.min(100, y));
+        updateHeroPreviewPosition();
+      }
+
+      if (heroCanvas) {
+        heroCanvas.addEventListener('mousedown', (e) => {
+          isDraggingHeroCanvas = true;
+          updateFocalPointFromEvent(e);
+        });
+        window.addEventListener('mousemove', (e) => {
+          if (isDraggingHeroCanvas) {
+            e.preventDefault();
+            updateFocalPointFromEvent(e);
+          }
+        });
+        window.addEventListener('mouseup', () => {
+          isDraggingHeroCanvas = false;
+        });
+
+        heroCanvas.addEventListener('touchstart', (e) => {
+          isDraggingHeroCanvas = true;
+          updateFocalPointFromEvent(e);
+        }, { passive: true });
+        window.addEventListener('touchmove', (e) => {
+          if (isDraggingHeroCanvas) {
+            updateFocalPointFromEvent(e);
+          }
+        }, { passive: true });
+        window.addEventListener('touchend', () => {
+          isDraggingHeroCanvas = false;
+        });
+      }
+
+      // Reset Hero position button
+      const btnResetPos = document.getElementById('btnResetHeroPos');
+      if (btnResetPos) {
+        btnResetPos.addEventListener('click', () => {
+          currentHeroPosH = 50;
+          currentHeroPosV = 50;
+          updateHeroPreviewPosition();
+        });
+      }
+
+      // YouTube Video parser & preview
+      document.getElementById('videoInputUrl').addEventListener('input', (e) => {
+        const parsed = parseYouTubeUrl(e.target.value);
+        document.getElementById('videoEmbedUrl').value = parsed.embedUrl;
+        document.getElementById('videoPreviewIframe').src = parsed.embedUrl || 'about:blank';
+      });
+
+      // Latest Release inputs & preview
+      document.getElementById('latestBadge').addEventListener('input', (e) => {
+        document.getElementById('previewLatestBadge').innerText = e.target.value || 'LATEST RELEASE';
+      });
+      document.getElementById('latestHeading').addEventListener('input', (e) => {
+        document.getElementById('previewLatestHeading').innerText = e.target.value || 'NEW MUSIC';
+      });
+      document.getElementById('latestTitle').addEventListener('input', (e) => {
+        document.getElementById('previewLatestTitle').innerText = e.target.value || 'Titel';
+      });
+      document.getElementById('latestArtwork').addEventListener('input', (e) => {
+        document.getElementById('previewLatestImg').src = e.target.value;
+      });
+      document.getElementById('latestListenBtn').addEventListener('input', (e) => {
+        document.getElementById('previewLatestListenBtn').innerText = e.target.value || 'Listen';
+      });
+      document.getElementById('latestWatchBtn').addEventListener('input', (e) => {
+        document.getElementById('previewLatestWatchBtn').innerText = e.target.value || 'Watch on YouTube';
+      });
+
+      // Latest Release Artwork Upload with INSTANT in-memory preview
+      document.getElementById('latestArtworkUploadInput').addEventListener('change', (e) => {
+        if (e.target.files && e.target.files[0]) {
+          const file = e.target.files[0];
+          const localBlob = URL.createObjectURL(file);
+          document.getElementById('previewLatestImg').src = localBlob;
+
+          uploadImageFile(file, document.getElementById('latestArtworkUploadStatus'), (url) => {
+            document.getElementById('latestArtwork').value = url;
+          });
+        }
+      });
+
+      // Add Release buttons
+      document.getElementById('btnAddRelease').addEventListener('click', addNewRelease);
+      document.getElementById('btnAddReleaseBottom').addEventListener('click', addNewRelease);
+
+      // Password toggle buttons
+      document.getElementById('btnLoginToggleToken').addEventListener('click', () => {
+        const inp = document.getElementById('loginGhToken');
+        inp.type = inp.type === 'password' ? 'text' : 'password';
+      });
+
+      // Top action buttons
+      document.getElementById('btnPublish').addEventListener('click', publishToGitHub);
+      document.getElementById('btnReload').addEventListener('click', () => fetchFromGitHub(false));
+      document.getElementById('btnTopLogout').addEventListener('click', lockDashboard);
+
+      // Offline / Local bypass
+      document.getElementById('btnContinueOffline').addEventListener('click', () => {
+        unlockDashboard('Lokaal');
+        tryLocalFetch();
+        showToast('Lokale Modus', 'Je bewerkt nu lokaal. Koppel een GitHub Key om live te publiceren.', 'info');
+      });
+
+      // INIT CHECK
+      const cfg = getStoredConfig();
+      if (cfg.token && cfg.repo) {
+        document.getElementById('loginGhOwner').value = cfg.owner || '';
+        document.getElementById('loginGhToken').value = cfg.token;
+
+        unlockDashboard();
+        fetchFromGitHub(true);
+      } else {
+        document.getElementById('loginGhOwner').value = '';
+        document.getElementById('loginGhToken').value = '';
+        populateForm(DEFAULT_DATA);
+      }
+    });
+  </script>
+</body>
+</html>
