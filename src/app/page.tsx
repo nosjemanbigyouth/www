@@ -119,6 +119,7 @@ function PlaceholderImage({
 
 export default function Home() {
     const [content, setContent] = useState<ContentState>(fallbackContent);
+    const [heroImgSrc, setHeroImgSrc] = useState(fallbackContent.hero.image);
 
     // Dynamic data injection on mount / DOM load
     useEffect(() => {
@@ -138,6 +139,9 @@ export default function Home() {
                         releases: Array.isArray(data.releases) ? data.releases : prev.releases,
                         socialLinks: { ...prev.socialLinks, ...(data.socialLinks || {}) },
                     }));
+                    if (data.hero?.image) {
+                        setHeroImgSrc(data.hero.image);
+                    }
                 }
             })
             .catch((err) => {
@@ -195,12 +199,13 @@ export default function Home() {
             <section className="relative h-screen flex items-center justify-center grain-overlay">
                 <div className="absolute inset-0 z-0">
                     <Image
-                        src={hero.image}
+                        src={heroImgSrc || "/img/hero.jpg"}
                         alt={hero.alt}
                         fill
                         className="object-cover"
                         style={{ objectPosition: (hero as any).position || "center" }}
                         priority
+                        onError={() => setHeroImgSrc("/img/hero.jpg")}
                     />
 
                     <div className="absolute inset-0 bg-gradient-to-b from-red-900/30 via-black/40 to-black" />
@@ -273,6 +278,7 @@ export default function Home() {
                                     src={latestRelease.artwork}
                                     alt={latestRelease.title}
                                     className="w-full h-full object-cover object-center rounded-sm shadow-2xl shadow-red-500/20 transition-transform duration-300 group-hover:scale-105"
+                                    onError={(e) => { (e.currentTarget as HTMLImageElement).src = "/img/album-cover.jpg"; }}
                                 />
                                 <div className="absolute inset-0 border border-white/10 rounded-sm group-hover:border-red-500/50 transition-all" />
                             </div>
@@ -329,6 +335,7 @@ export default function Home() {
                                         src={release.image}
                                         alt={release.title}
                                         className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                                        onError={(e) => { (e.currentTarget as HTMLImageElement).src = "/img/album-cover.jpg"; }}
                                     />
                                     <div className="absolute inset-0 bg-red-600/0 group-hover:bg-red-600/20 transition-colors" />
                                     <div className="absolute inset-0 border border-white/10 group-hover:border-red-500/50 transition-colors" />
