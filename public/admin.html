@@ -891,6 +891,9 @@
         <button class="tab-btn" data-tab="tab-social">
           <span class="nav-dot"></span> Social Links
         </button>
+        <button class="tab-btn" data-tab="tab-presskit">
+          <span class="nav-dot"></span> Contact &amp; Presskit
+        </button>
       </nav>
 
       <!-- TAB 1: HERO BANNER -->
@@ -1198,6 +1201,69 @@
         </div>
       </section>
 
+      <!-- TAB 6: CONTACT & PRESSKIT -->
+      <section id="tab-presskit" class="tab-panel">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">Contact &amp; Presskit</h2>
+              <p class="card-description">Beheer de presskit-link en upload direct een nieuwe perskit naar Vercel Blob (ook bestanden boven 4,5 MB).</p>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div>
+              <div class="form-group">
+                <label class="form-label" for="presskitUrl">Presskit Link / URL</label>
+                <input type="text" id="presskitUrl" class="form-control" placeholder="https://...blob.vercel-storage.com/...">
+                <p class="form-hint">Pas de link handmatig aan of upload hieronder een nieuw bestand naar Vercel Blob.</p>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="presskitButtonText">Knop Tekst</label>
+                <input type="text" id="presskitButtonText" class="form-control" placeholder="DOWNLOAD PRESSKIT" value="DOWNLOAD PRESSKIT">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Nieuwe Perskit Uploaden (Vercel Blob)</label>
+                <div class="upload-row">
+                  <input type="file" id="presskitUploadInput" accept=".zip,.pdf,.rar,.7z,.doc,.docx,application/pdf,application/zip" style="display: none;">
+                  <button type="button" id="btnUploadPresskit" class="upload-btn" onclick="document.getElementById('presskitUploadInput').click();">
+                    <span>📦</span> Upload nieuwe perskit naar Blob
+                  </button>
+                  <span id="presskitUploadStatus" class="upload-status"></span>
+                </div>
+                <div id="presskitProgressWrap" style="display:none; margin-top: 0.65rem;">
+                  <div style="width:100%; height:8px; background: rgba(255,255,255,0.08); border-radius:999px; overflow:hidden;">
+                    <div id="presskitProgressBar" style="width:0%; height:100%; background: var(--accent); transition: width 0.15s ease;"></div>
+                  </div>
+                </div>
+                <p class="form-hint">Directe browser-upload naar Vercel Blob (geen 4,5 MB limiet). Klik na het uploaden op <strong>Publiceren</strong> om de nieuwe link op te slaan.</p>
+              </div>
+            </div>
+
+            <div>
+              <div class="preview-box">
+                <div class="preview-header">
+                  <span>Live Contact Preview</span>
+                  <span class="badge badge-gray">Contact Sectie</span>
+                </div>
+                <div style="background: #0d0d0d; border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 2rem 1.25rem; text-align: center;">
+                  <p style="color: #ef4444; letter-spacing: 0.4em; font-size: 0.7rem; margin-bottom: 0.4rem;">BOOKINGS</p>
+                  <h3 style="font-size: 1.75rem; font-weight: 800; letter-spacing: 0.05em; margin-bottom: 1.25rem;">GET IN TOUCH</h3>
+                  <div style="font-size: 1.05rem; letter-spacing: 0.08em; color: #ffffff;">NOSJEMAN@GMAIL.COM</div>
+                  <div style="margin-top: 1.25rem;">
+                    <a id="previewPresskitBtn" href="#" target="_blank" rel="noopener noreferrer" style="display: inline-block; border: 1px solid rgba(255,255,255,0.3); padding: 0.55rem 1.25rem; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: #ffffff; text-decoration: none;">
+                      DOWNLOAD PRESSKIT
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
 
       <!-- Status Bar / Footer Info -->
       <div class="status-bar">
@@ -1287,6 +1353,10 @@
         tiktok: "https://tiktok.com/@nosjemanbigyouth",
         facebook: "https://facebook.com/nosjeman.bigyouth",
         youtube: "https://www.youtube.com/@nosjemanbigyouth"
+      },
+      presskit: {
+        url: "https://upvvtrjyvxmlw7tu.public.blob.vercel-storage.com/presskit/Nosjeman-Perskit-1w9KwGM7jg2viYGwRkRQUtfTiwipFH.zip?download=1",
+        buttonText: "DOWNLOAD PRESSKIT"
       },
       footerCopyright: "NOSJEMAN BIGYOUTH. IZHIA ARTS. JUICED UNICORN. All rights reserved."
     };
@@ -1537,6 +1607,89 @@
       };
 
       reader.readAsDataURL(file);
+    }
+
+    async function uploadPresskitFile(file, statusEl, progressWrap, progressBar, onUploaded) {
+      if (!file) return;
+      const cfg = getStoredConfig();
+      const uploadBtn = document.getElementById('btnUploadPresskit');
+      if (uploadBtn) uploadBtn.disabled = true;
+      if (statusEl) statusEl.innerText = 'Uploadtoken aanvragen...';
+      if (progressWrap) progressWrap.style.display = 'block';
+      if (progressBar) progressBar.style.width = '5%';
+
+      try {
+        const tokenRes = await fetch('/api/presskit/token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            filename: file.name,
+            contentType: file.type || 'application/octet-stream',
+            size: file.size,
+            githubToken: cfg.token || '',
+            repo: cfg.repo || 'nosjemanbigyouth/www'
+          })
+        });
+
+        const tokenData = await tokenRes.json().catch(() => ({}));
+        if (!tokenRes.ok || !tokenData.clientToken || !tokenData.uploadUrl) {
+          throw new Error(tokenData.error || `Kon geen uploadtoken ophalen (${tokenRes.status})`);
+        }
+
+        if (statusEl) statusEl.innerText = 'Bezig met uploaden naar Vercel Blob... 0%';
+
+        const contentType = file.type || 'application/octet-stream';
+        const result = await new Promise((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          xhr.open('PUT', tokenData.uploadUrl, true);
+          xhr.setRequestHeader('Authorization', `Bearer ${tokenData.clientToken}`);
+          xhr.setRequestHeader('x-api-version', '13');
+          xhr.setRequestHeader('x-vercel-blob-access', 'public');
+          xhr.setRequestHeader('x-content-type', contentType);
+          xhr.setRequestHeader('Content-Type', contentType);
+
+          xhr.upload.onprogress = (evt) => {
+            if (evt.lengthComputable) {
+              const pct = Math.min(99, Math.round((evt.loaded / evt.total) * 100));
+              if (progressBar) progressBar.style.width = `${pct}%`;
+              if (statusEl) statusEl.innerText = `Bezig met uploaden naar Vercel Blob... ${pct}%`;
+            }
+          };
+
+          xhr.onload = () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              try {
+                resolve(JSON.parse(xhr.responseText));
+              } catch (e) {
+                reject(new Error('Ongeldig antwoord ontvangen van Vercel Blob.'));
+              }
+            } else {
+              let msg = `Blob upload mislukt (${xhr.status})`;
+              try {
+                const errObj = JSON.parse(xhr.responseText);
+                if (errObj?.error?.message) msg = errObj.error.message;
+              } catch (e) {}
+              reject(new Error(msg));
+            }
+          };
+
+          xhr.onerror = () => reject(new Error('Netwerkfout tijdens het uploaden naar Vercel Blob.'));
+          xhr.send(file);
+        });
+
+        if (progressBar) progressBar.style.width = '100%';
+        const finalUrl = result.downloadUrl || result.url;
+        if (statusEl) statusEl.innerText = `Geüpload (${(file.size / (1024 * 1024)).toFixed(1)} MB) — Klik op Publiceren`;
+        showToast('Perskit Geüpload', 'Nieuwe perskit staat op Vercel Blob. Klik op Publiceren om de link op te slaan.', 'success', 7000);
+        onUploaded(finalUrl);
+      } catch (err) {
+        console.error('Presskit upload error:', err);
+        if (statusEl) statusEl.innerText = 'Upload mislukt';
+        if (progressWrap) progressWrap.style.display = 'none';
+        showToast('Upload Mislukt', err.message || 'Kon perskit niet uploaden.', 'danger', 7000);
+      } finally {
+        if (uploadBtn) uploadBtn.disabled = false;
+      }
     }
 
     // RENDER RELEASES DISCOGRAPHY
@@ -1838,6 +1991,19 @@
       document.getElementById('socialFacebook').value = soc.facebook || '';
       document.getElementById('socialYoutube').value = soc.youtube || '';
 
+      // Presskit
+      const pk = currentData.presskit || {};
+      const pkUrl = pk.url || '';
+      const pkBtnText = pk.buttonText || 'DOWNLOAD PRESSKIT';
+      document.getElementById('presskitUrl').value = pkUrl;
+      document.getElementById('presskitButtonText').value = pkBtnText;
+      const previewPkBtn = document.getElementById('previewPresskitBtn');
+      if (previewPkBtn) {
+        previewPkBtn.innerText = pkBtnText;
+        previewPkBtn.href = pkUrl || '#';
+        previewPkBtn.style.opacity = pkUrl ? '1' : '0.45';
+      }
+
       // Footer Copyright (Vast en niet-aanpasbaar)
       const copy = 'NOSJEMAN BIGYOUTH. IZHIA ARTS. JUICED UNICORN. All rights reserved.';
       currentData.footerCopyright = copy;
@@ -1888,6 +2054,12 @@
         tiktok: document.getElementById('socialTiktok').value.trim(),
         facebook: document.getElementById('socialFacebook').value.trim(),
         youtube: document.getElementById('socialYoutube').value.trim()
+      };
+
+      // Presskit
+      currentData.presskit = {
+        url: document.getElementById('presskitUrl').value.trim(),
+        buttonText: document.getElementById('presskitButtonText').value.trim() || 'DOWNLOAD PRESSKIT'
       };
 
       // Footer Copyright (Vast en niet-aanpasbaar)
@@ -2378,6 +2550,35 @@
       // Add Release buttons
       document.getElementById('btnAddRelease').addEventListener('click', addNewRelease);
       document.getElementById('btnAddReleaseBottom').addEventListener('click', addNewRelease);
+
+      // Presskit inputs & Vercel Blob upload
+      const presskitUrlInput = document.getElementById('presskitUrl');
+      const presskitBtnInput = document.getElementById('presskitButtonText');
+      const previewPresskitBtn = document.getElementById('previewPresskitBtn');
+      const syncPresskitPreview = () => {
+        if (!previewPresskitBtn) return;
+        const url = presskitUrlInput.value.trim();
+        previewPresskitBtn.innerText = presskitBtnInput.value.trim() || 'DOWNLOAD PRESSKIT';
+        previewPresskitBtn.href = url || '#';
+        previewPresskitBtn.style.opacity = url ? '1' : '0.45';
+      };
+      presskitUrlInput.addEventListener('input', syncPresskitPreview);
+      presskitBtnInput.addEventListener('input', syncPresskitPreview);
+      document.getElementById('presskitUploadInput').addEventListener('change', (e) => {
+        if (e.target.files && e.target.files[0]) {
+          const file = e.target.files[0];
+          uploadPresskitFile(
+            file,
+            document.getElementById('presskitUploadStatus'),
+            document.getElementById('presskitProgressWrap'),
+            document.getElementById('presskitProgressBar'),
+            (uploadedUrl) => {
+              presskitUrlInput.value = uploadedUrl;
+              syncPresskitPreview();
+            }
+          );
+        }
+      });
 
       // Password toggle buttons
       document.getElementById('btnLoginToggleToken').addEventListener('click', () => {

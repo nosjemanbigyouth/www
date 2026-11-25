@@ -70,6 +70,10 @@ const fallbackContent = {
         spotify: "https://open.spotify.com/artist/5pWOl8Mk1utpqJJ3ZL5O9H",
         youtube: "https://www.youtube.com/@nosjemanbigyouth",
     },
+    presskit: {
+        url: "https://upvvtrjyvxmlw7tu.public.blob.vercel-storage.com/presskit/Nosjeman-Perskit-1w9KwGM7jg2viYGwRkRQUtfTiwipFH.zip?download=1",
+        buttonText: "DOWNLOAD PRESSKIT",
+    },
     footerCopyright: "NOSJEMAN BIGYOUTH. IZHIA ARTS. JUICED UNICORN. All rights reserved.",
 };
 
@@ -138,6 +142,7 @@ export default function Home() {
                         latestRelease: { ...prev.latestRelease, ...(data.latestRelease || {}) },
                         releases: Array.isArray(data.releases) ? data.releases : prev.releases,
                         socialLinks: { ...prev.socialLinks, ...(data.socialLinks || {}) },
+                        presskit: { ...prev.presskit, ...(data.presskit || {}) },
                     }));
                     if (data.hero?.image) {
                         setHeroImgSrc(data.hero.image);
@@ -149,7 +154,7 @@ export default function Home() {
             });
     }, []);
 
-    const { hero, featuredVideo, latestRelease, releases, socialLinks } = content;
+    const { hero, featuredVideo, latestRelease, releases, socialLinks, presskit } = content;
 
     return (
         <main className="min-h-screen bg-[#0d0d0d] text-white overflow-x-hidden">
@@ -373,6 +378,19 @@ export default function Home() {
                     >
                         NOSJEMAN@GMAIL.COM
                     </a>
+                    {presskit?.url && (
+                        <div className="mt-6">
+                            <a
+                                href={presskit.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                download
+                                className="inline-block border border-white/30 hover:border-red-500 hover:bg-red-600/10 px-6 py-2.5 text-xs tracking-wider uppercase transition-all"
+                            >
+                                {presskit.buttonText || "DOWNLOAD PRESSKIT"}
+                            </a>
+                        </div>
+                    )}
                 </div>
             </section>
 
