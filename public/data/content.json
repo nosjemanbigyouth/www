@@ -2,7 +2,7 @@
   "hero": {
     "image": "/img/a_turn_my_uploaded_pho-041212.webp",
     "subtitle": "Reggae Artist",
-    "position": "44% 42%"
+    "position": "37% 42%"
   },
   "featuredVideo": {
     "youtubeUrl": "https://www.youtube.com/watch?v=2rV53wNfkOg",
@@ -49,7 +49,7 @@
     {
       "id": "rel-3",
       "title": "Check Clean",
-      "type": "Single",
+      "type": "EP",
       "year": "2025",
       "image": "/img/03.jpg",
       "link": "https://open.spotify.com/album/4ZCNBWFJeXvwHnB5RFEBZh"
@@ -57,7 +57,7 @@
     {
       "id": "rel-4",
       "title": "Buss A Blank",
-      "type": "Single",
+      "type": "EP",
       "year": "2023",
       "image": "/img/04.jpg",
       "link": "https://open.spotify.com/album/1Q4GHMpVDctmsYlDgHdua0"
