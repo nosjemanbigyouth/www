@@ -12,13 +12,13 @@
   "latestRelease": {
     "badge": "LATEST RELEASE",
     "heading": "NEW MUSIC",
-    "title": "Concrete Jungle",
+    "title": "Warning",
     "releaseDate": "2026",
-    "description": "Concrete Jungle",
-    "artwork": "/img/album-cover.jpg",
-    "spotifyUrl": "https://open.spotify.com/album/6U3V60m3Bs7bo2vHsHQWjB",
-    "youtubeUrl": "https://www.youtube.com/@nosjemanbigyouth",
-    "listenButtonText": "Listen to Concrete Jungle",
+    "description": "Warning",
+    "artwork": "/img/a_maak_de_afbeelding_1-145314.jpeg",
+    "spotifyUrl": "https://open.spotify.com/intl-nl/track/5bxPYEq595MAbDuUMHs1vW?si=7fd76b669d66470b",
+    "youtubeUrl": "https://youtu.be/5hsb3hLc4g4?si=6ImKnJOqwjfKbce7",
+    "listenButtonText": "Listen to Warning",
     "watchButtonText": "Watch on YouTube"
   },
   "releases": [
